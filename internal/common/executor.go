@@ -145,8 +145,8 @@ func NewCommandContext(opts ExecuteOptions) (*CommandContext, error) {
 		cfg.Cookie = opts.Cookie
 	}
 
-	// 创建 API 客户端
-	client := api.NewClient(cfg.Cookie, opts.Insecure)
+	// 创建 API 客户端（带上额外的认证 cookie）
+	client := api.NewClientWithExtra(cfg.Cookie, cfg.VerificationCode, cfg.ServiceID, opts.Insecure)
 
 	return &CommandContext{
 		Config:   cfg,

@@ -188,10 +188,18 @@ func createExtensionFiles(dir string) error {
         });
 
         const tokenCookie = allCookies.find(c => c.name === '#openPortal#token#');
+        const verifCookie = allCookies.find(c => c.name === 'openPortalVerificationCode');
+        const svcCookie   = allCookies.find(c => c.name === 'openPortalServiceID');
 
         if (tokenCookie && tokenCookie.value) {
             const token = tokenCookie.value;
-            const loginCommand = 'sdp login ' + token;
+            const verif = verifCookie ? verifCookie.value : '';
+            const svc   = svcCookie   ? svcCookie.value   : '';
+
+            let loginCommand = 'sdp login ' + token;
+            if (verif) loginCommand += ' --verification ' + verif;
+            if (svc)   loginCommand += ' --service ' + svc;
+
             const aiInstallPrompt = '请帮我配置山东能力平台 CLI 助手（sdp），安装完成后执行 sdp onboard 命令';
             const copyIcon = '\uD83D\uDCCB';
 

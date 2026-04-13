@@ -9,6 +9,9 @@ import (
 	"github.com/haibin1003/aaascli/internal/config"
 )
 
+var loginVerificationCode string
+var loginServiceID string
+
 // loginCmd 登录命令
 var loginCmd = &cobra.Command{
 	Use:   "login [token]",
@@ -28,17 +31,19 @@ var loginCmd = &cobra.Command{
 		if len(args) == 0 {
 			showLoginStatus()
 		} else {
-			setLoginCookie(args[0])
+			setLoginCookie(args[0], loginVerificationCode, loginServiceID)
 		}
 	},
 }
 
 func init() {
+	loginCmd.Flags().StringVar(&loginVerificationCode, "verification", "", "openPortalVerificationCode cookie 值")
+	loginCmd.Flags().StringVar(&loginServiceID, "service", "", "openPortalServiceID cookie 值")
 	rootCmd.AddCommand(loginCmd)
 }
 
 // setLoginCookie 设置登录 Cookie
-func setLoginCookie(cookieValue string) {
+func setLoginCookie(cookieValue, verificationCode, serviceID string) {
 	// 清理 cookie 值
 	cookieValue = strings.TrimSpace(cookieValue)
 	cookieValue = strings.TrimPrefix(cookieValue, "#openPortal#token#=")
@@ -58,7 +63,9 @@ func setLoginCookie(cookieValue string) {
 
 	// 保存配置
 	cfg := &config.Config{
-		Cookie: cookieValue,
+		Cookie:           cookieValue,
+		VerificationCode: verificationCode,
+		ServiceID:        serviceID,
 	}
 
 	if err := config.SaveConfig(cfg); err != nil {

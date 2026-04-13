@@ -12,20 +12,27 @@ import (
 
 const (
 	// DefaultTimeout 默认请求超时
-	DefaultTimeout = 30 * time.Second
+	DefaultTimeout = 60 * time.Second
 	// BaseURL 平台基础 URL
 	BaseURL = "https://service.sd.10086.cn/aaas"
 )
 
 // Client HTTP 客户端
 type Client struct {
-	HTTPClient *http.Client
-	Headers    map[string]string
-	Cookie     string
+	HTTPClient       *http.Client
+	Headers          map[string]string
+	Cookie           string
+	VerificationCode string
+	ServiceID        string
 }
 
 // NewClient 创建新客户端
 func NewClient(cookie string, insecure bool) *Client {
+	return NewClientWithExtra(cookie, "", "", insecure)
+}
+
+// NewClientWithExtra 创建带额外 cookie 的新客户端
+func NewClientWithExtra(cookie, verificationCode, serviceID string, insecure bool) *Client {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: insecure,
@@ -45,7 +52,9 @@ func NewClient(cookie string, insecure bool) *Client {
 			"Referer":         "https://service.sd.10086.cn/aaas/",
 			"User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
 		},
-		Cookie: cookie,
+		Cookie:           cookie,
+		VerificationCode: verificationCode,
+		ServiceID:        serviceID,
 	}
 }
 
@@ -56,10 +65,21 @@ func (c *Client) SetCookie(cookie string) {
 
 // GetFullCookie 构建完整 Cookie 字符串
 func (c *Client) GetFullCookie() string {
-	if strings.HasPrefix(c.Cookie, "#openPortal#token#=") {
-		return c.Cookie
+	var parts []string
+	if c.Cookie != "" {
+		if strings.HasPrefix(c.Cookie, "#openPortal#token#=") {
+			parts = append(parts, c.Cookie)
+		} else {
+			parts = append(parts, fmt.Sprintf("#openPortal#token#=%s", c.Cookie))
+		}
 	}
-	return fmt.Sprintf("#openPortal#token#=%s", c.Cookie)
+	if c.VerificationCode != "" {
+		parts = append(parts, fmt.Sprintf("openPortalVerificationCode=%s", c.VerificationCode))
+	}
+	if c.ServiceID != "" {
+		parts = append(parts, fmt.Sprintf("openPortalServiceID=%s", c.ServiceID))
+	}
+	return strings.Join(parts, "; ")
 }
 
 // Request 发送 HTTP 请求

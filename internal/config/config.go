@@ -9,7 +9,9 @@ import (
 
 // Config 配置结构
 type Config struct {
-	Cookie string `json:"cookie"`
+	Cookie               string `json:"cookie"`
+	VerificationCode     string `json:"verificationCode,omitempty"`
+	ServiceID            string `json:"serviceId,omitempty"`
 }
 
 // GetDefaultConfigPath 返回默认配置文件路径
