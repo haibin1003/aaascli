@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (tokenCookie && tokenCookie.value) {
             const token = tokenCookie.value;
             const loginCommand = `sdp login ${token}`;
-            const aiInstallPrompt = '请帮我全局安装 @yourname/sdp，使用 npm/pnpm/yarn 均可，安装完成后执行 sdp onboard 命令';
+            const aiInstallPrompt = '请帮我配置山东能力平台 CLI 助手（sdp），安装完成后执行 sdp onboard 命令';
             const copyIcon = '📋';
 
             content.innerHTML = `

@@ -10,14 +10,12 @@ import (
 
 var helperOutputDir string
 
-// helperCmd 浏览器插件助手命令
 var helperCmd = &cobra.Command{
 	Use:   "helper",
 	Short: "浏览器插件助手",
 	Long:  "安装浏览器插件，一键复制 login 认证命令",
 }
 
-// helperExtractCmd 释放插件命令
 var helperExtractCmd = &cobra.Command{
 	Use:   "extract [output-dir]",
 	Short: "释放浏览器扩展到指定目录",
@@ -38,7 +36,6 @@ func init() {
 	rootCmd.AddCommand(helperCmd)
 }
 
-// runHelperExtract 运行释放插件
 func runHelperExtract(cmd *cobra.Command, args []string) error {
 	outputDir := helperOutputDir
 	if outputDir == "" && len(args) > 0 {
@@ -79,7 +76,6 @@ func runHelperExtract(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// getDesktopPath 获取桌面路径
 func getDesktopPath() string {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -97,17 +93,31 @@ func getDesktopPath() string {
 	return homeDir
 }
 
-// createExtensionFiles 创建扩展文件
 func createExtensionFiles(dir string) error {
 	manifest := `{
   "manifest_version": 3,
-  "name": "山东能力平台登录助手",
+  "name": "山东能力平台助手",
   "version": "1.0",
   "description": "一键复制山东能力平台 CLI 登录命令",
-  "permissions": ["cookies", "activeTab"],
-  "host_permissions": ["https://*.sd.10086.cn/*"],
+  "permissions": [
+    "cookies",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
   }
 }`
 	if err := os.WriteFile(filepath.Join(dir, "manifest.json"), []byte(manifest), 0644); err != nil {
@@ -115,24 +125,34 @@ func createExtensionFiles(dir string) error {
 	}
 
 	html := `<!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>山东能力平台助手</title>
     <style>
-        body { width: 320px; padding: 16px; font-family: sans-serif; font-size: 14px; }
-        .header { font-weight: bold; margin-bottom: 12px; }
-        .token-box { background: #f5f5f5; padding: 10px; border-radius: 4px; word-break: break-all; font-family: monospace; font-size: 12px; margin: 10px 0; border: 1px solid #ddd; }
-        .copy-btn { width: 100%; padding: 8px; background: #1890ff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .copy-btn:hover { background: #40a9ff; }
-        .error { color: #ff4d4f; text-align: center; padding: 20px; }
-        .success { color: #52c41a; text-align: center; margin-top: 8px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { width: 380px; padding: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; background: #f5f7fa; }
+        .header { text-align: center; margin-bottom: 16px; }
+        .header h1 { font-size: 18px; color: #1a1a1a; margin-bottom: 4px; }
+        .header p { font-size: 12px; color: #666; }
+        .content { background: #fff; border-radius: 8px; padding: 12px; }
+        .hint { font-size: 12px; color: #666; margin-bottom: 8px; }
+        .command-box { background: #f0f2f5; border-radius: 6px; padding: 12px; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; color: #333; cursor: pointer; position: relative; word-break: break-all; line-height: 1.5; transition: background 0.2s; }
+        .command-box:hover { background: #e4e7eb; }
+        .copy-icon { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 14px; }
+        .success-tip { text-align: center; color: #52c41a; font-size: 12px; margin-top: 8px; }
+        .error { text-align: center; color: #ff4d4f; padding: 20px; font-size: 14px; }
+        .promo-section { margin-top: 16px; padding-top: 12px; border-top: 1px dashed #d9d9d9; }
+        .promo-title { font-size: 12px; color: #1890ff; margin-bottom: 8px; font-weight: 500; }
     </style>
 </head>
 <body>
-    <div id="content">
-        <div class="header">山东能力平台登录助手</div>
-        <div id="status">正在获取登录凭证...</div>
+    <div class="header">
+        <h1>山东能力平台助手</h1>
+        <p>快速获取 CLI 登录凭证</p>
     </div>
+    <div id="content" class="content"></div>
     <script src="popup.js"></script>
 </body>
 </html>`
@@ -140,32 +160,114 @@ func createExtensionFiles(dir string) error {
 		return err
 	}
 
-	js := `chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    const url = new URL(tabs[0].url);
-    if (!url.hostname.includes('sd.10086.cn')) {
-        document.getElementById('content').innerHTML = '<div class="error">请在山东能力平台页面使用此插件</div>';
-        return;
-    }
-    chrome.cookies.getAll({domain: ".sd.10086.cn"}, function(cookies) {
-        const tokenCookie = cookies.find(c => c.name === '#openPortal#token#');
+	js := `document.addEventListener('DOMContentLoaded', async () => {
+    const content = document.getElementById('content');
+
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+        if (!tab || !tab.url) {
+            content.innerHTML = '<div class="error">请在山东能力平台页面点击本图标</div>';
+            return;
+        }
+
+        const url = new URL(tab.url);
+
+        if (!url.hostname.includes('10086.cn') && !url.hostname.includes('sd.10086.cn')) {
+            content.innerHTML = '<div class="error">请在山东能力平台页面点击本图标</div>';
+            return;
+        }
+
+        let allCookies = [];
+        const currentCookies = await chrome.cookies.getAll({ domain: url.hostname });
+        allCookies.push(...currentCookies);
+
+        const parts = url.hostname.split('.');
+        for (let i = 1; i < parts.length - 1; i++) {
+            const parentDomain = parts.slice(i).join('.');
+            const parentCookies = await chrome.cookies.getAll({ domain: parentDomain });
+            allCookies.push(...parentCookies);
+        }
+
+        const seen = new Set();
+        allCookies = allCookies.filter(c => {
+            const key = c.domain + c.name;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+
+        const tokenCookie = allCookies.find(c => c.name === '#openPortal#token#');
+
         if (tokenCookie && tokenCookie.value) {
-            const cmd = 'sdp login ' + tokenCookie.value;
-            document.getElementById('content').innerHTML = 
-                '<div class="header">登录命令已生成</div>' +
-                '<div class="token-box" id="cmd">' + cmd + '</div>' +
-                '<button class="copy-btn" id="copyBtn">复制命令</button>' +
-                '<div id="msg"></div>';
-            document.getElementById('copyBtn').addEventListener('click', function() {
-                const cmdText = document.getElementById('cmd').innerText;
-                navigator.clipboard.writeText(cmdText).then(function() {
-                    document.getElementById('msg').innerHTML = '<div class="success">已复制到剪贴板</div>';
+            const token = tokenCookie.value;
+            const loginCommand = 'sdp login ' + token;
+            const aiInstallPrompt = '请帮我配置山东能力平台 CLI 助手（sdp），安装完成后执行 sdp onboard 命令';
+            const copyIcon = '\uD83D\uDCCB';
+
+            content.innerHTML =
+                '<div class="hint">1. AI 配置指令（推荐）</div>' +
+                '<div class="command-box" id="aiInstallBox" title="点击复制">' +
+                    escapeHtml(aiInstallPrompt) +
+                    '<span class="copy-icon">' + copyIcon + '</span>' +
+                '</div>' +
+                '<div class="success-tip" id="aiInstallTip" style="display:none;">\u2713 已复制，请发送给 AI</div>' +
+
+                '<div class="hint" style="margin-top: 12px;">2. 登录命令（点击复制）</div>' +
+                '<div class="command-box" id="authBox" title="点击复制">' +
+                    escapeHtml(loginCommand) +
+                    '<span class="copy-icon">' + copyIcon + '</span>' +
+                '</div>' +
+                '<div class="success-tip" id="authTip" style="display:none;">\u2713 已复制，请在终端执行</div>' +
+
+                '<div class="promo-section">' +
+                    '<div class="promo-title">\uD83D\uDE80 推荐给其他同学</div>' +
+                    '<div class="command-box" id="promoBox" title="点击复制">' +
+                        escapeHtml(aiInstallPrompt) +
+                        '<span class="copy-icon">' + copyIcon + '</span>' +
+                    '</div>' +
+                    '<div class="success-tip" id="promoTip" style="display:none;">\u2713 已复制</div>' +
+                '</div>';
+
+            document.getElementById('aiInstallBox').addEventListener('click', () => {
+                navigator.clipboard.writeText(aiInstallPrompt).then(() => {
+                    const tip = document.getElementById('aiInstallTip');
+                    tip.style.display = 'block';
+                    setTimeout(() => tip.style.display = 'none', 2000);
                 });
             });
+
+            document.getElementById('authBox').addEventListener('click', () => {
+                navigator.clipboard.writeText(loginCommand).then(() => {
+                    const tip = document.getElementById('authTip');
+                    tip.style.display = 'block';
+                    setTimeout(() => tip.style.display = 'none', 2000);
+                });
+            });
+
+            document.getElementById('promoBox').addEventListener('click', () => {
+                navigator.clipboard.writeText(aiInstallPrompt).then(() => {
+                    const tip = document.getElementById('promoTip');
+                    tip.style.display = 'block';
+                    setTimeout(() => tip.style.display = 'none', 2000);
+                });
+            });
+
         } else {
-            document.getElementById('content').innerHTML = '<div class="error">请先登录山东能力平台</div>';
+            content.innerHTML = '<div class="error">未找到登录凭证<br>请先登录山东能力平台</div>';
         }
-    });
-});`
+
+    } catch (error) {
+        console.error(error);
+        content.innerHTML = '<div class="error">获取登录凭证失败<br>请刷新页面后重试</div>';
+    }
+});
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}`
 	if err := os.WriteFile(filepath.Join(dir, "popup.js"), []byte(js), 0644); err != nil {
 		return err
 	}
