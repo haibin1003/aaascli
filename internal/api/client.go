@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -14,7 +15,7 @@ const (
 	// DefaultTimeout 默认请求超时
 	DefaultTimeout = 60 * time.Second
 	// BaseURL 平台基础 URL
-	BaseURL = "https://service.sd.10086.cn/aaas"
+	BaseURL = "https://service.sd.10086.cn"
 )
 
 // Client HTTP 客户端
@@ -24,6 +25,7 @@ type Client struct {
 	Cookie           string
 	VerificationCode string
 	ServiceID        string
+	Crypto           *CryptoContext
 }
 
 // NewClient 创建新客户端
@@ -47,7 +49,7 @@ func NewClientWithExtra(cookie, verificationCode, serviceID string, insecure boo
 		Headers: map[string]string{
 			"Accept":          "application/json, text/plain, */*",
 			"Accept-Language": "zh-CN,zh;q=0.9",
-			"Content-Type":    "application/json",
+			"Content-Type":    "application/x-www-form-urlencoded",
 			"Origin":          "https://service.sd.10086.cn",
 			"Referer":         "https://service.sd.10086.cn/aaas/",
 			"User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -55,7 +57,30 @@ func NewClientWithExtra(cookie, verificationCode, serviceID string, insecure boo
 		Cookie:           cookie,
 		VerificationCode: verificationCode,
 		ServiceID:        serviceID,
+		Crypto:           &CryptoContext{},
 	}
+}
+
+// ensureCrypto 确保加密上下文就绪
+func (c *Client) ensureCrypto() error {
+	if c.Crypto.LocalKeyPair == nil {
+		pair, err := GenerateRSAKeyPair()
+		if err != nil {
+			return fmt.Errorf("generate local RSA key pair failed: %w", err)
+		}
+		c.Crypto.LocalKeyPair = pair
+	}
+
+	if c.Crypto.PlatformPubKey == "" || time.Now().After(c.Crypto.PubKeyExpireAt) {
+		pubKey, err := RefreshPlatformPublicKey(c.GetFullCookie())
+		if err != nil {
+			return fmt.Errorf("refresh platform public key failed: %w", err)
+		}
+		c.Crypto.PlatformPubKey = pubKey
+		c.Crypto.PubKeyExpireAt = time.Now().Add(5 * time.Minute)
+	}
+
+	return nil
 }
 
 // SetCookie 设置认证 Cookie
@@ -88,11 +113,18 @@ func (c *Client) Request(method, path string, body interface{}) (*http.Response,
 
 	var bodyReader io.Reader
 	if body != nil {
-		jsonData, err := json.Marshal(body)
-		if err != nil {
-			return nil, fmt.Errorf("marshal request body failed: %w", err)
+		switch v := body.(type) {
+		case string:
+			bodyReader = strings.NewReader(v)
+		case []byte:
+			bodyReader = bytes.NewReader(v)
+		default:
+			jsonData, err := json.Marshal(body)
+			if err != nil {
+				return nil, fmt.Errorf("marshal request body failed: %w", err)
+			}
+			bodyReader = bytes.NewReader(jsonData)
 		}
-		bodyReader = strings.NewReader(string(jsonData))
 	}
 
 	req, err := http.NewRequest(method, url, bodyReader)
@@ -108,6 +140,15 @@ func (c *Client) Request(method, path string, body interface{}) (*http.Response,
 	// 设置 Cookie
 	if c.Cookie != "" {
 		req.Header.Set("Cookie", c.GetFullCookie())
+	}
+
+	// 设置 token header（平台部分接口需要）
+	if c.Cookie != "" {
+		tokenValue := c.Cookie
+		if strings.HasPrefix(tokenValue, "#openPortal#token#=") {
+			tokenValue = strings.TrimPrefix(tokenValue, "#openPortal#token#=")
+		}
+		req.Header.Set("token", tokenValue)
 	}
 
 	resp, err := c.HTTPClient.Do(req)
@@ -126,6 +167,63 @@ func (c *Client) Get(path string) (*http.Response, error) {
 // Post 发送 POST 请求
 func (c *Client) Post(path string, body interface{}) (*http.Response, error) {
 	return c.Request(http.MethodPost, path, body)
+}
+
+// PostEncrypted 发送加密的 POST 请求，并自动解密响应
+func (c *Client) PostEncrypted(path string, body interface{}) (*http.Response, error) {
+	if err := c.ensureCrypto(); err != nil {
+		return nil, err
+	}
+
+	// 将 body 转为 JSON 字符串作为明文
+	var plainBody string
+	switch v := body.(type) {
+	case string:
+		plainBody = v
+	case []byte:
+		plainBody = string(v)
+	default:
+		b, err := json.Marshal(v)
+		if err != nil {
+			return nil, fmt.Errorf("marshal request body failed: %w", err)
+		}
+		plainBody = string(b)
+	}
+
+	encryptedBody, err := c.Crypto.EncryptRequest(plainBody, c.Headers["Content-Type"])
+	if err != nil {
+		return nil, fmt.Errorf("encrypt request failed: %w", err)
+	}
+
+	resp, err := c.Request(http.MethodPost, path, encryptedBody)
+	if err != nil {
+		return nil, err
+	}
+
+	// 读取响应体
+	respBody, err := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		return nil, fmt.Errorf("read response body failed: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(respBody))
+	}
+
+	// 尝试解密响应
+	decryptedBody, err := c.Crypto.DecryptResponse(string(respBody))
+	if err != nil {
+		// 解密失败，可能是未加密的响应，回退原文
+		decryptedBody = string(respBody)
+	}
+
+	// 重新构造 Response
+	resp.Body = io.NopCloser(strings.NewReader(decryptedBody))
+	resp.ContentLength = int64(len(decryptedBody))
+	resp.Header.Del("Content-Length")
+
+	return resp, nil
 }
 
 // ParseJSON 解析 JSON 响应
