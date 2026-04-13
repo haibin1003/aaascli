@@ -1,156 +1,150 @@
 package api
 
 import (
-	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
-
-	"go.uber.org/zap"
 )
 
-// Request represents an HTTP request
-type Request struct {
-	URL     string
-	Method  string
-	Headers map[string]string
-	Body    interface{}
-}
+const (
+	// DefaultTimeout 默认请求超时
+	DefaultTimeout = 30 * time.Second
+	// BaseURL 平台基础 URL
+	BaseURL = "https://service.sd.10086.cn/aaas"
+)
 
-// Client is an HTTP client for sending requests
+// Client HTTP 客户端
 type Client struct {
 	HTTPClient *http.Client
-	Logger     *zap.Logger
+	Headers    map[string]string
+	Cookie     string
 }
 
-// DefaultTimeout is the default timeout for HTTP requests
-const DefaultTimeout = 30 * time.Second
-
-// defaultTransport is the shared HTTP transport with connection pooling
-var defaultTransport = NewEnhancedTransport(false)
-
-// insecureTransport is the shared HTTP transport for insecure connections
-var insecureTransport = NewEnhancedTransport(true)
-
-// NewClient creates a new Client with default HTTP client
-func NewClient() *Client {
-	logger, _ := zap.NewProduction()
+// NewClient 创建新客户端
+func NewClient(cookie string, insecure bool) *Client {
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: insecure,
+		},
+	}
 
 	return &Client{
 		HTTPClient: &http.Client{
 			Timeout:   DefaultTimeout,
-			Transport: defaultTransport,
+			Transport: transport,
 		},
-		Logger: logger,
+		Headers: map[string]string{
+			"Accept":          "application/json, text/plain, */*",
+			"Accept-Language": "zh-CN,zh;q=0.9",
+			"Content-Type":    "application/json",
+			"Origin":          "https://service.sd.10086.cn",
+			"Referer":         "https://service.sd.10086.cn/aaas/",
+			"User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+		},
+		Cookie: cookie,
 	}
 }
 
-// NewClientWithLogger creates a new Client with custom logger
-func NewClientWithLogger(logger *zap.Logger) *Client {
-	return &Client{
-		HTTPClient: &http.Client{
-			Timeout:   DefaultTimeout,
-			Transport: defaultTransport,
-		},
-		Logger: logger,
-	}
+// SetCookie 设置认证 Cookie
+func (c *Client) SetCookie(cookie string) {
+	c.Cookie = cookie
 }
 
-// NewInsecureClient creates a new Client that skips TLS verification
-func NewInsecureClient() *Client {
-	logger, _ := zap.NewProduction()
-
-	return &Client{
-		HTTPClient: &http.Client{
-			Transport: insecureTransport,
-			Timeout:   DefaultTimeout,
-		},
-		Logger: logger,
+// GetFullCookie 构建完整 Cookie 字符串
+func (c *Client) GetFullCookie() string {
+	if strings.HasPrefix(c.Cookie, "#openPortal#token#=") {
+		return c.Cookie
 	}
+	return fmt.Sprintf("#openPortal#token#=%s", c.Cookie)
 }
 
-// NewInsecureClientWithLogger creates a new Client with custom logger that skips TLS verification
-func NewInsecureClientWithLogger(logger *zap.Logger) *Client {
-	return &Client{
-		HTTPClient: &http.Client{
-			Transport: insecureTransport,
-			Timeout:   DefaultTimeout,
-		},
-		Logger: logger,
-	}
-}
+// Request 发送 HTTP 请求
+func (c *Client) Request(method, path string, body interface{}) (*http.Response, error) {
+	url := BaseURL + path
 
-// Send sends an HTTP request and returns the response
-func (c *Client) Send(apiReq *Request) (*http.Response, error) {
-	var reqBody io.Reader
-
-	// Convert request body to appropriate format
-	if apiReq.Body != nil {
-		// If body is already an io.Reader, use it directly
-		if reader, ok := apiReq.Body.(io.Reader); ok {
-			// Read for logging (then we need to recreate it)
-			if data, err := io.ReadAll(reader); err == nil {
-				c.Logger.Debug("Sending request",
-					zap.String("url", apiReq.URL),
-					zap.String("method", apiReq.Method),
-					zap.String("body", string(data)))
-				// Use the read data as body
-				reqBody = bytes.NewBuffer(data)
-				// Close the original reader if it implements io.Closer
-				if closer, ok := reader.(io.Closer); ok {
-					closer.Close()
-				}
-			} else {
-				reqBody = reader
-			}
-		} else {
-			// Otherwise, treat as JSON
-			jsonData, err := json.Marshal(apiReq.Body)
-			if err != nil {
-				c.Logger.Error("Error marshaling JSON", zap.Error(err))
-				return nil, fmt.Errorf("error marshaling JSON: %w", err)
-			}
-			reqBody = bytes.NewBuffer(jsonData)
-
-			// Log request details
-			c.Logger.Debug("Sending request",
-				zap.String("url", apiReq.URL),
-				zap.String("method", apiReq.Method),
-				zap.String("body", string(jsonData)))
+	var bodyReader io.Reader
+	if body != nil {
+		jsonData, err := json.Marshal(body)
+		if err != nil {
+			return nil, fmt.Errorf("marshal request body failed: %w", err)
 		}
-	} else {
-		c.Logger.Debug("Sending request",
-			zap.String("url", apiReq.URL),
-			zap.String("method", apiReq.Method))
+		bodyReader = strings.NewReader(string(jsonData))
 	}
 
-	// Create HTTP request
-	req, err := http.NewRequest(apiReq.Method, apiReq.URL, reqBody)
+	req, err := http.NewRequest(method, url, bodyReader)
 	if err != nil {
-		c.Logger.Error("Error creating request", zap.Error(err))
-		return nil, fmt.Errorf("error creating request: %w", err)
+		return nil, fmt.Errorf("create request failed: %w", err)
 	}
 
-	// Set request headers
-	for key, value := range apiReq.Headers {
+	// 设置请求头
+	for key, value := range c.Headers {
 		req.Header.Set(key, value)
-		c.Logger.Debug("Request header", zap.String(key, value))
 	}
 
-	// Log request headers
-	c.Logger.Debug("Sending request headers", zap.Any("headers", req.Header))
+	// 设置 Cookie
+	if c.Cookie != "" {
+		req.Header.Set("Cookie", c.GetFullCookie())
+	}
 
-	// Send request
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		c.Logger.Error("Error sending request", zap.Error(err))
-		return nil, fmt.Errorf("error sending request: %w", err)
+		return nil, fmt.Errorf("send request failed: %w", err)
 	}
 
-	// Log response status
-	c.Logger.Debug("Received response", zap.String("status", resp.Status))
-
 	return resp, nil
+}
+
+// Get 发送 GET 请求
+func (c *Client) Get(path string) (*http.Response, error) {
+	return c.Request(http.MethodGet, path, nil)
+}
+
+// Post 发送 POST 请求
+func (c *Client) Post(path string, body interface{}) (*http.Response, error) {
+	return c.Request(http.MethodPost, path, body)
+}
+
+// ParseJSON 解析 JSON 响应
+func ParseJSON(resp *http.Response, v interface{}) error {
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("read response body failed: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
+	}
+
+	if err := json.Unmarshal(body, v); err != nil {
+		return fmt.Errorf("parse JSON failed: %w, body: %s", err, string(body))
+	}
+
+	return nil
+}
+
+// Response 统一响应结构
+type Response struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data"`
+}
+
+// IsSuccess 判断响应是否成功
+func (r *Response) IsSuccess() bool {
+	return r.Code == 200 || r.Success
+}
+
+// Error 返回错误信息
+func (r *Response) Error() error {
+	if r.IsSuccess() {
+		return nil
+	}
+	return fmt.Errorf("API error [%d]: %s", r.Code, r.Message)
 }

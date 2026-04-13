@@ -1,0 +1,17 @@
+{
+  "name": "@aaas/sd-windows-x64",
+  "version": "0.1.0",
+  "description": "山东能力平台 CLI Windows x64 平台二进制包",
+  "os": ["win32"],
+  "cpu": ["x64"],
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "index.js",
+    "bin/"
+  ],
+  "author": "SDP Team",
+  "license": "MIT"
+}

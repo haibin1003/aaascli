@@ -1,10 +1,9 @@
 package main
 
 import (
-	"github.com/user/lc/cmd/lc"
+	"github.com/haibin1003/aaascli/cmd/sdp"
 )
 
-// 版本信息，由 Makefile 在构建时注入
 var (
 	Version   = "dev"
 	Commit    = "unknown"
