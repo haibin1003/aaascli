@@ -1,0 +1,21 @@
+{
+  "name": "@lingji/lc-darwin-arm64",
+  "version": "0.3.0",
+  "description": "灵码 CLI macOS arm64 平台二进制包",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "index.js",
+    "bin/"
+  ],
+  "author": "LC Team",
+  "license": "MIT"
+}

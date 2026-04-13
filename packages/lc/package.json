@@ -1,0 +1,30 @@
+{
+  "name": "@lingji/lc",
+  "version": "0.3.0",
+  "description": "灵码 CLI 工具 - 代码仓库、需求、任务管理平台",
+  "bin": {
+    "lc": "bin/lc.js"
+  },
+  "keywords": [
+    "cli",
+    "devtools",
+    "lingma",
+    "code",
+    "repository",
+    "requirement",
+    "task"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "LC Team",
+  "license": "MIT",
+  "optionalDependencies": {
+    "@lingji/lc-linux-x64": "0.3.0",
+    "@lingji/lc-linux-arm64": "0.3.0",
+    "@lingji/lc-darwin-x64": "0.3.0",
+    "@lingji/lc-darwin-arm64": "0.3.0",
+    "@lingji/lc-windows-x64": "0.3.0",
+    "@lingji/lc-windows-arm64": "0.3.0"
+  }
+}

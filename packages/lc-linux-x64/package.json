@@ -1,0 +1,21 @@
+{
+  "name": "@lingji/lc-linux-x64",
+  "version": "0.3.0",
+  "description": "灵码 CLI Linux x64 平台二进制包",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "index.js",
+    "bin/"
+  ],
+  "author": "LC Team",
+  "license": "MIT"
+}

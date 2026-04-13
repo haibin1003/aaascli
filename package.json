@@ -1,0 +1,13 @@
+{
+  "name": "lc",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "version:sync": "node scripts/sync-version.js",
+    "build:npm": "make build-npm",
+    "publish:npm": "make npm-publish",
+    "release": "make npm-release"
+  }
+}
