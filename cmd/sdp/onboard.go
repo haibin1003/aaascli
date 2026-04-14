@@ -78,6 +78,11 @@ func printOnboardGuide() {
   sdp onboard                           显示本指南
   sdp --help                            查看所有命令
 
+【知识库】
+  sdp knowledge list                    查看内置知识文档列表
+  sdp knowledge view <name>             阅读指定知识文档
+  sdp knowledge search <keyword>        在知识库中搜索关键词
+
 三、典型使用场景
 --------------------------------------------------------------------------------
 
@@ -160,6 +165,8 @@ func printOnboardGuide() {
   sdp service search <keyword> --size 10   搜索 API 服务
   sdp service view <service-id>            查看服务详情
   sdp app list --size 10                   查看我的应用
+  sdp knowledge list                       查看知识文档
+  sdp knowledge search <keyword>           搜索知识库
   sdp login <token>                        登录
   sdp helper extract [dir]                 释放浏览器插件
 
