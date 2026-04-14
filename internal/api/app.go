@@ -52,3 +52,56 @@ func (s *AppService) List() (*AppAuthListResponse, error) {
 
 	return &result, nil
 }
+
+// MyApp 我的应用信息
+type MyApp struct {
+	AppID       string `json:"appId"`
+	AppName     string `json:"appName"`
+	AppCode     string `json:"appCode"`
+	Status      string `json:"status"`
+	StatusName  string `json:"statusName"`
+	CreateTime  string `json:"createTime"`
+	Description string `json:"appDesc"`
+}
+
+// MyAppListResponse 我的应用列表响应
+type MyAppListResponse struct {
+	Status string `json:"status"`
+	Code   string `json:"code"`
+	Msg    string `json:"msg"`
+	Data   struct {
+		AppList []MyApp `json:"appList"`
+		List    []MyApp `json:"list"`
+	} `json:"data"`
+}
+
+// ListMyApps 查询我的应用列表
+func (s *AppService) ListMyApps(page, size int, appName string) ([]MyApp, error) {
+	if page <= 0 {
+		page = 1
+	}
+	if size <= 0 {
+		size = 10
+	}
+	body := fmt.Sprintf("pgnum=%d&pgsize=%d&appName=%s", page, size, appName)
+	contentType := "application/x-www-form-urlencoded"
+
+	resp, err := s.client.PostMultipart("/openportalsrv/rest/portaluser/appManager/qryMyAppList", contentType, []byte(body))
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	var result MyAppListResponse
+	if err := ParseJSON(resp, &result); err != nil {
+		return nil, fmt.Errorf("parse response failed: %w", err)
+	}
+
+	if result.Code != "00000" {
+		return nil, fmt.Errorf("API error [%s]: %s", result.Code, result.Msg)
+	}
+
+	if len(result.Data.AppList) > 0 {
+		return result.Data.AppList, nil
+	}
+	return result.Data.List, nil
+}

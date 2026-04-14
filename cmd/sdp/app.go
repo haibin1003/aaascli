@@ -11,6 +11,7 @@ import (
 var (
 	appPage    int
 	appSize    int
+	appName    string
 	abilityID  string
 	bomcID     string
 )
@@ -23,17 +24,17 @@ var appCmd = &cobra.Command{
 
 var appListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "查看我的应用授权列表",
+	Short: "查看我的应用列表",
 	Run: func(cmd *cobra.Command, args []string) {
-		listApps()
+		listMyApps()
 	},
 }
 
 var appAuthListCmd = &cobra.Command{
 	Use:   "auth-list",
-	Short: "查看能力授权列表（同 app list）",
+	Short: "查看能力授权列表",
 	Run: func(cmd *cobra.Command, args []string) {
-		listApps()
+		listAppAuths()
 	},
 }
 
@@ -68,22 +69,23 @@ func init() {
 
 	appListCmd.Flags().IntVar(&appPage, "page", 1, "页码")
 	appListCmd.Flags().IntVarP(&appSize, "size", "s", 20, "每页条数")
+	appListCmd.Flags().StringVarP(&appName, "name", "n", "", "应用名称过滤")
 
 	appAuthAbilityCmd.Flags().StringVarP(&abilityID, "ability", "a", "", "能力 ID")
 	appAuthAbilityCmd.Flags().StringVarP(&bomcID, "bomc", "b", "", "BOMC 工单编码")
 }
 
-func listApps() {
+func listMyApps() {
 	common.Execute(func(ctx *common.CommandContext) (interface{}, error) {
 		if err := ctx.CheckLoggedIn(); err != nil {
 			return nil, err
 		}
 		service := api.NewAppService(ctx.Client)
-		resp, err := service.List()
+		items, err := service.ListMyApps(appPage, appSize, appName)
 		if err != nil {
 			return nil, fmt.Errorf("查询失败: %w", err)
 		}
-		return formatAppList(resp), nil
+		return formatMyAppList(items, appPage, appSize), nil
 	}, common.ExecuteOptions{
 		DebugMode:   debugMode,
 		Insecure:    insecure,
@@ -93,7 +95,66 @@ func listApps() {
 	})
 }
 
-func formatAppList(resp *api.AppAuthListResponse) map[string]interface{} {
+func listAppAuths() {
+	common.Execute(func(ctx *common.CommandContext) (interface{}, error) {
+		if err := ctx.CheckLoggedIn(); err != nil {
+			return nil, err
+		}
+		service := api.NewAppService(ctx.Client)
+		resp, err := service.List()
+		if err != nil {
+			return nil, fmt.Errorf("查询失败: %w", err)
+		}
+		return formatAppAuthList(resp), nil
+	}, common.ExecuteOptions{
+		DebugMode:   debugMode,
+		Insecure:    insecure,
+		DryRun:      dryRun,
+		Cookie:      cookieFlag,
+		PrettyPrint: prettyPrint,
+	})
+}
+
+func formatMyAppList(items []api.MyApp, page, size int) map[string]interface{} {
+	if items == nil {
+		items = []api.MyApp{}
+	}
+	total := len(items)
+	start := (page - 1) * size
+	end := start + size
+	if start > total {
+		start = total
+	}
+	if end > total {
+		end = total
+	}
+	pageItems := items[start:end]
+
+	formatted := make([]map[string]interface{}, 0)
+	for _, a := range pageItems {
+		formatted = append(formatted, map[string]interface{}{
+			"appId":       a.AppID,
+			"appName":     a.AppName,
+			"appCode":     a.AppCode,
+			"status":      a.Status,
+			"statusName":  a.StatusName,
+			"createTime":  a.CreateTime,
+			"description": a.Description,
+		})
+	}
+
+	return map[string]interface{}{
+		"items": formatted,
+		"pagination": map[string]interface{}{
+			"page":  page,
+			"size":  size,
+			"total": total,
+			"pages": (total + size - 1) / size,
+		},
+	}
+}
+
+func formatAppAuthList(resp *api.AppAuthListResponse) map[string]interface{} {
 	if resp.Data.AuthorizedList == nil {
 		resp.Data.AuthorizedList = []api.AppAuth{}
 	}
