@@ -205,6 +205,47 @@ func (s *AbilityService) GetDetail(abilityID string) (*AbilityDetail, error) {
 	return &detail, nil
 }
 
+// AbilityServiceItem 能力下的服务项
+type AbilityServiceItem struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Code        string `json:"code"`
+	ServiceType string `json:"serviceType"` // inner / outer
+	CatalogName string `json:"catalogName"`
+}
+
+// AbilityServiceMenuResponse 能力下服务列表响应
+type AbilityServiceMenuResponse struct {
+	Status string `json:"status"`
+	Code   string `json:"code"`
+	Msg    string `json:"msg"`
+	Data   struct {
+		ServiceMenus []AbilityServiceItem `json:"serviceMenus"`
+	} `json:"data"`
+}
+
+// ListServices 查询能力下的服务列表
+func (s *AbilityService) ListServices(abilityID string) ([]AbilityServiceItem, error) {
+	body := fmt.Sprintf("capacityId=%s", abilityID)
+	contentType := "application/x-www-form-urlencoded"
+
+	resp, err := s.client.PostMultipart("/openportalsrv/rest/portalmain/capacityMgr/queryServiceMenuList", contentType, []byte(body))
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	var result AbilityServiceMenuResponse
+	if err := ParseJSON(resp, &result); err != nil {
+		return nil, fmt.Errorf("parse response failed: %w", err)
+	}
+
+	if result.Code != "00000" {
+		return nil, fmt.Errorf("API error [%s]: %s", result.Code, result.Msg)
+	}
+
+	return result.Data.ServiceMenus, nil
+}
+
 // OrderAbility 订购能力
 func (s *AbilityService) OrderAbility(abilityID string) error {
 	return fmt.Errorf("订购接口尚未实现，请在浏览器中手动完成订购")

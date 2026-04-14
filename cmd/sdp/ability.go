@@ -56,6 +56,15 @@ var abilityOrderCmd = &cobra.Command{
 	},
 }
 
+var abilityServicesCmd = &cobra.Command{
+	Use:   "services [ability-id]",
+	Short: "查看能力下的服务列表",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		listAbilityServices(args[0])
+	},
+}
+
 var abilityMyCmd = &cobra.Command{
 	Use:   "my",
 	Short: "查看我的能力（已订购）",
@@ -70,6 +79,7 @@ func init() {
 	abilityCmd.AddCommand(abilitySearchCmd)
 	abilityCmd.AddCommand(abilityViewCmd)
 	abilityCmd.AddCommand(abilityOrderCmd)
+	abilityCmd.AddCommand(abilityServicesCmd)
 	abilityCmd.AddCommand(abilityMyCmd)
 
 	abilityListCmd.Flags().IntVar(&abilityPage, "page", 1, "页码")
@@ -77,6 +87,9 @@ func init() {
 
 	abilitySearchCmd.Flags().IntVar(&abilityPage, "page", 1, "页码")
 	abilitySearchCmd.Flags().IntVarP(&abilitySize, "size", "s", 20, "每页条数")
+
+	abilityServicesCmd.Flags().IntVar(&abilityPage, "page", 1, "页码")
+	abilityServicesCmd.Flags().IntVarP(&abilitySize, "size", "s", 20, "每页条数")
 
 	abilityMyCmd.Flags().IntVar(&abilityPage, "page", 1, "页码")
 	abilityMyCmd.Flags().IntVarP(&abilitySize, "size", "s", 20, "每页条数")
@@ -165,6 +178,26 @@ func orderAbility(abilityID string) {
 	})
 }
 
+func listAbilityServices(abilityID string) {
+	common.Execute(func(ctx *common.CommandContext) (interface{}, error) {
+		if err := ctx.CheckLoggedIn(); err != nil {
+			return nil, err
+		}
+		service := api.NewAbilityService(ctx.Client)
+		items, err := service.ListServices(abilityID)
+		if err != nil {
+			return nil, fmt.Errorf("查询服务列表失败: %w", err)
+		}
+		return formatAbilityServiceSlice(items, abilityPage, abilitySize), nil
+	}, common.ExecuteOptions{
+		DebugMode:   debugMode,
+		Insecure:    insecure,
+		DryRun:      dryRun,
+		Cookie:      cookieFlag,
+		PrettyPrint: prettyPrint,
+	})
+}
+
 func listMyAbilities() {
 	common.Execute(func(ctx *common.CommandContext) (interface{}, error) {
 		if err := ctx.CheckLoggedIn(); err != nil {
@@ -210,6 +243,43 @@ func formatAbilitySlice(items []api.Ability, page, size int) map[string]interfac
 			"provider": a.Provider,
 			"status":   a.Status,
 			"category": a.CatalogName,
+		})
+	}
+
+	return map[string]interface{}{
+		"items": formatted,
+		"pagination": map[string]interface{}{
+			"page":  page,
+			"size":  size,
+			"total": total,
+			"pages": (total + size - 1) / size,
+		},
+	}
+}
+
+func formatAbilityServiceSlice(items []api.AbilityServiceItem, page, size int) map[string]interface{} {
+	if items == nil {
+		items = []api.AbilityServiceItem{}
+	}
+	total := len(items)
+	start := (page - 1) * size
+	end := start + size
+	if start > total {
+		start = total
+	}
+	if end > total {
+		end = total
+	}
+	pageItems := items[start:end]
+
+	formatted := make([]map[string]interface{}, 0)
+	for _, s := range pageItems {
+		formatted = append(formatted, map[string]interface{}{
+			"id":          s.ID,
+			"name":        s.Name,
+			"code":        s.Code,
+			"serviceType": s.ServiceType,
+			"catalogName": s.CatalogName,
 		})
 	}
 
