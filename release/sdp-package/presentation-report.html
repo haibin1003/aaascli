@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>山东能力平台 CLI 助手 - 项目汇报</title>
+<style>
+:root { --primary: #2563eb; --primary-dark: #1d4ed8; --secondary: #10b981; --accent: #f59e0b; --dark: #1e293b; --light: #f8fafc; --gray: #64748b; --border: #e2e8f0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; color: var(--dark); background: #fff; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.cover { background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%); color: white; padding: 100px 0 80px; text-align: center; position: relative; overflow: hidden; }
+.cover::before { content: ""; position: absolute; top: -50%; right: -20%; width: 600px; height: 600px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+.cover-badge { display: inline-block; background: rgba(255,255,255,0.15); padding: 8px 20px; border-radius: 20px; font-size: 14px; margin-bottom: 24px; backdrop-filter: blur(4px); }
+.cover h1 { font-size: 48px; margin-bottom: 16px; font-weight: 700; }
+.cover-subtitle { font-size: 22px; opacity: 0.9; margin-bottom: 40px; }
+.cover-meta { display: flex; justify-content: center; gap: 40px; font-size: 15px; opacity: 0.85; }
+section { padding: 64px 0; }
+.section-title { font-size: 32px; font-weight: 700; margin-bottom: 12px; color: var(--dark); }
+.section-subtitle { font-size: 16px; color: var(--gray); margin-bottom: 40px; }
+.section-header { text-align: center; margin-bottom: 48px; }
+.bg-light { background: var(--light); }
+.pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px; }
+.pain-card { background: white; border-radius: 12px; padding: 28px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid #ef4444; }
+.pain-card h3 { font-size: 18px; margin-bottom: 12px; color: #b91c1c; }
+.pain-card p { color: var(--gray); font-size: 15px; }
+.solution-banner { background: linear-gradient(90deg, #ecfdf5 0%, #d1fae5 100%); border-radius: 16px; padding: 40px; display: flex; align-items: center; gap: 32px; border: 1px solid #a7f3d0; }
+.solution-icon { width: 80px; height: 80px; background: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; flex-shrink: 0; }
+.solution-text h3 { font-size: 24px; margin-bottom: 8px; color: #065f46; }
+.solution-text p { color: #047857; font-size: 16px; }
+.arch-diagram { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 32px; }
+.arch-layers { display: flex; flex-direction: column; gap: 16px; }
+.arch-layer { display: flex; align-items: center; gap: 16px; padding: 20px 24px; border-radius: 10px; font-size: 15px; }
+.arch-layer-label { width: 100px; font-weight: 600; color: var(--gray); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+.arch-boxes { display: flex; flex-wrap: wrap; gap: 12px; flex: 1; }
+.arch-box { padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; }
+.layer-user .arch-box { background: #dbeafe; color: #1e40af; }
+.layer-cli .arch-box { background: #c7d2fe; color: #3730a3; }
+.layer-core .arch-box { background: #ddd6fe; color: #5b21b6; }
+.layer-platform .arch-box { background: #fce7f3; color: #9d174d; }
+.arch-highlights { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.arch-highlight { background: white; padding: 24px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
+.arch-highlight .num { font-size: 32px; font-weight: 700; color: var(--primary); display: block; margin-bottom: 4px; }
+.arch-highlight .label { font-size: 14px; color: var(--gray); }
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+.feature-card { background: white; border-radius: 14px; padding: 32px; border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s; }
+.feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.1); }
+.feature-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px; }
+.feature-card h3 { font-size: 20px; margin-bottom: 12px; }
+.feature-card ul { list-style: none; }
+.feature-card li { padding: 6px 0; padding-left: 20px; position: relative; color: var(--gray); font-size: 14px; }
+.feature-card li::before { content: "✓"; position: absolute; left: 0; color: var(--secondary); font-weight: 700; }
+.flow-steps { display: flex; justify-content: space-between; gap: 16px; position: relative; margin-top: 24px; }
+.flow-steps::before { content: ""; position: absolute; top: 28px; left: 10%; right: 10%; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary)); z-index: 0; }
+.flow-step { flex: 1; text-align: center; position: relative; z-index: 1; }
+.flow-num { width: 56px; height: 56px; background: white; border: 3px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: var(--primary); margin: 0 auto 16px; }
+.flow-step h4 { font-size: 16px; margin-bottom: 6px; }
+.flow-step p { font-size: 13px; color: var(--gray); }
+.result-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+.result-card { background: white; border-radius: 14px; padding: 28px; border-top: 4px solid var(--primary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+.result-card h3 { font-size: 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+.result-card p { color: var(--gray); font-size: 14px; line-height: 1.8; }
+.result-tag { display: inline-block; background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-top: 12px; }
+.stats-bar { background: var(--dark); color: white; padding: 48px 0; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 32px; text-align: center; }
+.stat-item .num { font-size: 40px; font-weight: 700; color: var(--accent); display: block; }
+.stat-item .label { font-size: 14px; opacity: 0.8; margin-top: 4px; }
+.quote-section { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 64px 0; text-align: center; }
+.quote-text { font-size: 26px; font-weight: 600; color: #0c4a6e; max-width: 800px; margin: 0 auto 24px; line-height: 1.5; }
+.quote-author { color: var(--gray); font-size: 15px; }
+footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: center; font-size: 14px; }
+.code-block { background: #0f172a; color: #e2e8f0; padding: 20px 24px; border-radius: 10px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; overflow-x: auto; line-height: 1.6; }
+.code-block .comment { color: #64748b; }
+.code-block .cmd { color: #7dd3fc; }
+@media (max-width: 768px) {
+  .cover h1 { font-size: 32px; }
+  .flow-steps { flex-direction: column; }
+  .flow-steps::before { display: none; }
+  .solution-banner { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- 封面 -->
+<section class="cover">
+  <div class="container">
+    <div class="cover-badge">数字化转型 / AI 赋能</div>
+    <h1>山东能力平台 CLI 助手</h1>
+    <p class="cover-subtitle">让 AI 从「只能建议」升级为「可以直接执行」</p>
+    <div class="cover-meta">
+      <span>2026年4月</span>
+      <span>项目汇报</span>
+      <span>山东移动能力开放平台</span>
+    </div>
+  </div>
+</section>
+
+<!-- 一、项目背景 -->
+<section>
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">01 / 项目背景</h2>
+      <p class="section-subtitle">为什么我们要做这款工具？</p>
+    </div>
+    
+    <div class="pain-grid">
+      <div class="pain-card">
+        <h3>平台操作依赖浏览器</h3>
+        <p>山东能力开放平台所有查询、订购、授权操作都必须在网页端完成，AI 助手无法直接调用，只能「口头指导」用户手动点击。</p>
+      </div>
+      <div class="pain-card">
+        <h3>人工查询效率低下</h3>
+        <p>平台汇聚了 325+ 业务能力和 3800+ 具体 API 服务，纯人工浏览查找耗时久，难以快速匹配业务需求。</p>
+      </div>
+      <div class="pain-card">
+        <h3>AI 价值无法落地</h3>
+        <p>AI 拥有强大的信息整合和代码生成能力，但缺乏直接访问企业内部平台的通道，导致「有脑子、没手脚」。</p>
+      </div>
+      <div class="pain-card">
+        <h3>跨平台部署困难</h3>
+        <p>不同 AI 运行环境各异（Windows / Linux / macOS / x64 / ARM64），缺少一个统一、轻量、零依赖的客户端。</p>
+      </div>
+    </div>
+    
+    <div class="solution-banner">
+      <div class="solution-icon">💡</div>
+      <div class="solution-text">
+        <h3>核心解决思路</h3>
+        <p>为 AI 助手打造一款专用的命令行客户端（CLI），通过逆向平台接口协议，让 AI 能够直接查询能力目录、检索 API 服务、查看接口详情，甚至基于返回数据生成调用代码和业务方案。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 二、架构设计 -->
+<section class="bg-light">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">02 / 架构设计</h2>
+      <p class="section-subtitle">轻量化、安全、跨平台、可扩展</p>
+    </div>
+    
+    <div class="arch-diagram">
+      <div class="arch-layers">
+        <div class="arch-layer layer-user">
+          <div class="arch-layer-label">交互层</div>
+          <div class="arch-boxes">
+            <div class="arch-box">人类用户</div>
+            <div class="arch-box">AI 助手</div>
+            <div class="arch-box">Chrome 插件(Token提取)</div>
+          </div>
+        </div>
+        <div class="arch-layer layer-cli">
+          <div class="arch-layer-label">CLI 层</div>
+          <div class="arch-boxes">
+            <div class="arch-box">Cobra 命令框架</div>
+            <div class="arch-box">能力/服务/应用/知识库 命令组</div>
+            <div class="arch-box">内置知识库(go:embed)</div>
+          </div>
+        </div>
+        <div class="arch-layer layer-core">
+          <div class="arch-layer-label">核心层</div>
+          <div class="arch-boxes">
+            <div class="arch-box">RSA+AES 混合加密</div>
+            <div class="arch-box">GBK/UTF-8 自动转码</div>
+            <div class="arch-box">Cookie/Token 认证注入</div>
+            <div class="arch-box">Multipart/JSON/Form 请求适配</div>
+          </div>
+        </div>
+        <div class="arch-layer layer-platform">
+          <div class="arch-layer-label">平台层</div>
+          <div class="arch-boxes">
+            <div class="arch-box">山东能力开放平台 API</div>
+            <div class="arch-box">能力目录服务</div>
+            <div class="arch-box">数字服务网关</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="arch-highlights">
+      <div class="arch-highlight"><span class="num">Go</span><span class="label">单二进制文件<br>零运行时依赖</span></div>
+      <div class="arch-highlight"><span class="num">6</span><span class="label">跨平台构建<br>Win/Linux/macOS</span></div>
+      <div class="arch-highlight"><span class="num">RSA+AES</span><span class="label">完整还原<br>平台加密协议</span></div>
+      <div class="arch-highlight"><span class="num">Vendor</span><span class="label">依赖全内置<br>离线环境可编译</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 三、核心功能 -->
+<section>
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">03 / 核心功能</h2>
+      <p class="section-subtitle">四大模块，覆盖能力查询、服务检索、应用管理和知识赋能</p>
+    </div>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#dbeafe;">📦</div>
+        <h3>能力管理（Ability）</h3>
+        <ul>
+          <li>查询全部 325+ 业务能力列表</li>
+          <li>按关键词快速搜索能力</li>
+          <li>查看能力详情（描述、提供方、分类）</li>
+          <li>浏览能力下挂载的服务菜单</li>
+          <li>查询我的已订购能力</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#dcfce7;">🔌</div>
+        <h3>数字服务管理（Service）</h3>
+        <ul>
+          <li>查询全量 3800+ 服务目录</li>
+          <li>搜索具体 API 服务接口</li>
+          <li>查看服务详情：URL、方法、协议</li>
+          <li>获取请求/响应示例 JSON</li>
+          <li>查看接口负责人和联系方式</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#fef3c7;">📚</div>
+        <h3>知识库（Knowledge）</h3>
+        <ul>
+          <li>内置能力使用指南（Markdown）</li>
+          <li>典型业务场景和组合方案</li>
+          <li>Python / Java / Go 代码模板</li>
+          <li>常见问题与故障排查</li>
+          <li>支持全文搜索和片段提取</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#f3e8ff;">🔐</div>
+        <h3>认证与辅助（Auth & Helper）</h3>
+        <ul>
+          <li>Chrome 插件一键提取 Token</li>
+          <li>CLI 自动保存登录凭证</li>
+          <li>TLS 跳过验证，适配内网环境</li>
+          <li>AI onboarding 引导指南</li>
+          <li>Pretty-print JSON 输出</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 四、使用流程 -->
+<section class="bg-light">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">04 / 使用流程</h2>
+      <p class="section-subtitle">四步完成部署，AI 即可开始服务</p>
+    </div>
+    
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <h4>AI 安装 CLI</h4>
+        <p>根据系统架构选择二进制文件<br>放入 PATH 即可运行</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <h4>用户导入插件</h4>
+        <p>Chrome 加载 sdp-login-helper<br>登录平台后复制 Token 给 AI</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <h4>AI 执行登录</h4>
+        <p>运行 sdp login 完成认证<br>即可查询能力、生成方案</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <h4>持续智能服务</h4>
+        <p>查询接口、搜索知识库<br>输出方案和调用代码</p>
+      </div>
+    </div>
+    
+    <div style="margin-top:48px;">
+      <div class="code-block">
+        <div class="comment">// 典型交互示例：搜索能力 -> 查看详情 -> 生成代码</div>
+        <div><span class="cmd">$</span> sdp ability search "短信定位" --size 5</div>
+        <div><span class="cmd">$</span> sdp ability view CA202512091059315001040209490536</div>
+        <div><span class="cmd">$</span> sdp service view SE202604081915467601182242</div>
+        <div><span class="cmd">$</span> sdp knowledge search "代码示例"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 五、成效与价值 -->
+<section>
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">05 / 成效与价值</h2>
+      <p class="section-subtitle">我们做这件事，究竟带来了什么改变？</p>
+    </div>
+    
+    <div class="result-cards">
+      <div class="result-card">
+        <h3>🚀 AI 从「顾问」变成「执行者」</h3>
+        <p>过去 AI 只能告诉用户「你可以去平台搜一下这个能力」。现在 AI 可以直接执行查询、分析返回结果、输出方案，真正实现了「动手」而不仅是「动嘴」。</p>
+        <span class="result-tag">核心价值</span>
+      </div>
+      <div class="result-card">
+        <h3>⏱️ 能力匹配效率提升 10 倍以上</h3>
+        <p>平台 325+ 能力、3800+ 服务全靠人工浏览需要数小时。通过 CLI + AI 检索，用户只需描述业务场景，30 秒内即可获得精准的能力推荐和接口详情。</p>
+        <span class="result-tag">效率提升</span>
+      </div>
+      <div class="result-card">
+        <h3>🛠️ 降低技术接入门槛</h3>
+        <p>AI 可基于接口返回的 requestExample 和 responseExample，自动生成 Python / Java / Go 调用代码。普通业务人员无需阅读复杂文档即可完成对接。</p>
+        <span class="result-tag">降本增效</span>
+      </div>
+      <div class="result-card">
+        <h3>🌐 一次构建，全平台覆盖</h3>
+        <p>同时提供 Windows(x64/ARM64)、Linux(x64/ARM64)、macOS(Intel/Apple Silicon) 六个版本的二进制文件，无论 AI 运行在哪种环境都能即装即用。</p>
+        <span class="result-tag">工程优势</span>
+      </div>
+      <div class="result-card">
+        <h3>📚 知识沉淀，越用越聪明</h3>
+        <p>内置知识库将短信触达、机器视觉、定位服务等典型方案固化到二进制中。AI 可以直接引用最佳实践，而不是每次从零推理，回答质量更稳定。</p>
+        <span class="result-tag">知识资产</span>
+      </div>
+      <div class="result-card">
+        <h3>🔒 安全合规，不离线不泄露</h3>
+        <p>所有依赖均已 Vendor 化，可在完全离线的内网环境编译和运行。Token 和 Cookie 仅保存在本地配置文件，不经过任何第三方服务。</p>
+        <span class="result-tag">安全可控</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 数据指标 -->
+<section class="stats-bar">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span class="num">325+</span>
+        <span class="label">业务能力已接入查询</span>
+      </div>
+      <div class="stat-item">
+        <span class="num">3800+</span>
+        <span class="label">数字服务/API 可检索</span>
+      </div>
+      <div class="stat-item">
+        <span class="num">6</span>
+        <span class="label">平台二进制覆盖</span>
+      </div>
+      <div class="stat-item">
+        <span class="num">5</span>
+        <span class="label">内置知识文档</span>
+      </div>
+      <div class="stat-item">
+        <span class="num">0</span>
+        <span class="label">运行时外部依赖</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 结语 -->
+<section class="quote-section">
+  <div class="container">
+    <p class="quote-text">" 这款工具不是为了让 AI 替代人类，而是让 AI 成为人类操作复杂企业平台时的得力助手。"</p>
+    <p class="quote-author">—— 山东能力平台 CLI 助手 · 项目愿景</p>
+  </div>
+</section>
+
+<!-- 未来规划（简要） -->
+<section class="bg-light">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">06 / 未来规划</h2>
+      <p class="section-subtitle">持续迭代，让 AI 的能力边界进一步扩展</p>
+    </div>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#dbeafe;">🛒</div>
+        <h3>能力订购自动化</h3>
+        <ul>
+          <li>捕获并模拟订购提交接口</li>
+          <li>AI 辅助填写订购申请表单</li>
+          <li>自动跟踪审批状态</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#dcfce7;">🔑</div>
+        <h3>应用授权自动化</h3>
+        <ul>
+          <li>支持 BOMC 工单号自动关联</li>
+          <li>批量为应用授权多个能力</li>
+          <li>实时查询授权审批进度</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#fef3c7;">🧠</div>
+        <h3>知识库持续扩充</h3>
+        <ul>
+          <li>引入更多行业场景方案</li>
+          <li>接入平台官方变更日志</li>
+          <li>支持用户自定义知识文档</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#f3e8ff;">🔗</div>
+        <h3>开放 SDK / MCP Server</h3>
+        <ul>
+          <li>提供 Go SDK 供其他系统调用</li>
+          <li>封装为 MCP Server 供更多 AI 接入</li>
+          <li>支持 WebSocket 实时推送能力状态</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 页脚 -->
+<footer>
+  <div class="container">
+    <p>山东能力平台 CLI 助手 · 2026年4月 · 项目汇报材料</p>
+  </div>
+</footer>
+
+</body>
+</html>
