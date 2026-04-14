@@ -327,7 +327,97 @@ sdp ability view CA202507031538155471116699106450
 
 ---
 
-## 八、文件位置速查
+## 八、AI 增值建议（如何更好地帮助用户）
+
+你不仅仅是一个命令执行器。拿到平台数据后，你可以主动为用户提供更高价值的输出：
+
+### 8.1 基于能力列表输出解决方案建议
+
+当用户描述业务场景但不知道选什么能力时，你可以：
+
+1. 运行 `sdp ability list/search` 获取相关能力
+2. 结合能力的 `category`（分类）、`desc`（描述）、`provider`（提供方）做匹配
+3. 输出包含以下内容的能力选型方案：
+   - **核心能力**：最匹配用户主诉求的 1-3 个能力
+   - **辅助能力**：配合核心能力所需的支撑能力（如短信通知、定位、认证等）
+   - **能力组合逻辑**：这些能力如何串联形成完整业务闭环
+   - **接入建议**：哪些能力可以直接调用，哪些可能需要用户手动订购
+
+**示例输出结构**：
+```markdown
+### 智慧景区客流预警方案
+
+| 角色 | 能力名称 | 能力ID | 作用 |
+|------|---------|--------|------|
+| 核心 | 电子围栏服务能力 | CA2024... | 实时监测景区边界内人口动态 |
+| 辅助 | 大数据短信触达能力 | CA2025... | 超员时向管理员发送预警短信 |
+| 辅助 | 短信定位能力 | CA2025... | 获取游客实时位置辅助疏散 |
+
+**业务流程建议**：
+1. 通过「电子围栏」实时统计景区内人数
+2. 当人数超过阈值时，触发「大数据短信触达」通知安保人员
+3. 需要精准疏散时，调用「短信定位」获取游客位置分布
+```
+
+### 8.2 基于服务详情生成调用代码
+
+当用户拿到 `service view` 的返回后，你可以根据接口元数据生成可直接运行的代码模板。
+
+`service view` 返回的关键字段：
+- `requestTypeText`：HTTP 方法（GET / POST）
+- `requestUrl`：接口路径
+- `protocol`：协议（HTTP / HTTPS）
+- `requestExample`：请求体 JSON 示例（字符串）
+- `responseExample`：响应体 JSON 示例（字符串）
+- `serviceId` / `interfaceId`：接口标识
+
+**你应该生成的内容**：
+1. **基础调用代码**：使用用户指定的语言（Java / Python / Go / JavaScript / Shell 等）
+2. **必要的常量/配置**：BaseURL、Header（如 `token`）、Content-Type
+3. **请求体构造**：根据 `requestExample` 生成结构体 / Dict / Class
+4. **响应体解析**：根据 `responseExample` 生成对应的解析逻辑
+5. **错误处理**：HTTP 状态码检查、超时设置、异常捕获
+6. **使用说明**：如何替换 token、必填参数有哪些
+
+**示例（Python requests）**：
+```python
+import requests
+import json
+
+BASE_URL = "https://service.sd.10086.cn"
+TOKEN = "你的token"
+
+def check_line_bind_fw(subs_id, region, priv_id):
+    url = f"{BASE_URL}/openapi/GroupServicer?method=checkLineBindFW"
+    headers = {
+        "Content-Type": "application/json",
+        "token": TOKEN
+    }
+    payload = {
+        "subsId": subs_id,
+        "region": region,
+        "privId": priv_id
+    }
+    resp = requests.post(url, headers=headers, json=payload, timeout=30)
+    resp.raise_for_status()
+    return resp.json()
+
+if __name__ == "__main__":
+    result = check_line_bind_fw("537*******", "537", "pg.vi.cmnet")
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+```
+
+### 8.3 其他增值服务建议
+
+- **能力对比表**：当用户在多个相似能力间犹豫时，提取关键字段做成对比表格
+- **接口文档草案**：基于 `service view` 输出一份 Markdown 格式的接口文档（含请求参数、返回值、示例）
+- **项目 README 能力依赖说明**：帮用户整理 "本项目使用了山东能力平台的以下能力..."
+- **订购检查清单**：在执行订购前，帮用户核对需要准备的材料（如 BOMC 工单号、应用名称等）
+- **中文乱码/字段解释**：如果返回的字段名不够直观，主动解释每个字段的业务含义
+
+---
+
+## 九、文件位置速查
 
 | 文件 | 路径 |
 |------|------|
