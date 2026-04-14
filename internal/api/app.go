@@ -55,13 +55,25 @@ func (s *AppService) List() (*AppAuthListResponse, error) {
 
 // MyApp 我的应用信息
 type MyApp struct {
-	AppID       string `json:"appId"`
-	AppName     string `json:"appName"`
-	AppCode     string `json:"appCode"`
-	Status      string `json:"status"`
-	StatusName  string `json:"statusName"`
-	CreateTime  string `json:"createTime"`
-	Description string `json:"appDesc"`
+	AppID           string `json:"appId"`
+	AppName         string `json:"appName"`
+	AppLevel        string `json:"appLevel"`
+	Status          string `json:"status"`
+	ShowStatusName  string `json:"showStatusName"`
+	AuditStatus     string `json:"auditStatus"`
+	MaxQuotaNum     int    `json:"maxQuotaNum"`
+	AppImgPath      string `json:"appImgPath"`
+	UserID          string `json:"userId"`
+	Remark          string `json:"remark"`
+}
+
+// MyAppPage 应用分页对象
+type MyAppPage struct {
+	PageNum   int     `json:"pageNum"`
+	PageSize  int     `json:"pageSize"`
+	Total     int     `json:"total"`
+	Pages     int     `json:"pages"`
+	List      []MyApp `json:"list"`
 }
 
 // MyAppListResponse 我的应用列表响应
@@ -70,8 +82,7 @@ type MyAppListResponse struct {
 	Code   string `json:"code"`
 	Msg    string `json:"msg"`
 	Data   struct {
-		AppList []MyApp `json:"appList"`
-		List    []MyApp `json:"list"`
+		AppList MyAppPage `json:"appList"`
 	} `json:"data"`
 }
 
@@ -100,8 +111,5 @@ func (s *AppService) ListMyApps(page, size int, appName string) ([]MyApp, error)
 		return nil, fmt.Errorf("API error [%s]: %s", result.Code, result.Msg)
 	}
 
-	if len(result.Data.AppList) > 0 {
-		return result.Data.AppList, nil
-	}
-	return result.Data.List, nil
+	return result.Data.AppList.List, nil
 }

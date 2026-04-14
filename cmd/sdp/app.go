@@ -133,13 +133,16 @@ func formatMyAppList(items []api.MyApp, page, size int) map[string]interface{} {
 	formatted := make([]map[string]interface{}, 0)
 	for _, a := range pageItems {
 		formatted = append(formatted, map[string]interface{}{
-			"appId":       a.AppID,
-			"appName":     a.AppName,
-			"appCode":     a.AppCode,
-			"status":      a.Status,
-			"statusName":  a.StatusName,
-			"createTime":  a.CreateTime,
-			"description": a.Description,
+			"appId":          a.AppID,
+			"appName":        a.AppName,
+			"appLevel":       a.AppLevel,
+			"status":         a.Status,
+			"showStatusName": a.ShowStatusName,
+			"auditStatus":    a.AuditStatus,
+			"maxQuotaNum":    a.MaxQuotaNum,
+			"appImgPath":     a.AppImgPath,
+			"userId":         a.UserID,
+			"remark":         a.Remark,
 		})
 	}
 
