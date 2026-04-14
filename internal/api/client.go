@@ -169,6 +169,43 @@ func (c *Client) Post(path string, body interface{}) (*http.Response, error) {
 	return c.Request(http.MethodPost, path, body)
 }
 
+// PostMultipart 发送 multipart/form-data POST 请求
+func (c *Client) PostMultipart(path string, contentType string, body []byte) (*http.Response, error) {
+	url := BaseURL + path
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("create request failed: %w", err)
+	}
+
+	// 设置请求头
+	for key, value := range c.Headers {
+		req.Header.Set(key, value)
+	}
+	// 覆盖 Content-Type
+	req.Header.Set("Content-Type", contentType)
+
+	// 设置 Cookie
+	if c.Cookie != "" {
+		req.Header.Set("Cookie", c.GetFullCookie())
+	}
+
+	// 设置 token header
+	if c.Cookie != "" {
+		tokenValue := c.Cookie
+		if strings.HasPrefix(tokenValue, "#openPortal#token#=") {
+			tokenValue = strings.TrimPrefix(tokenValue, "#openPortal#token#=")
+		}
+		req.Header.Set("token", tokenValue)
+	}
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("send request failed: %w", err)
+	}
+
+	return resp, nil
+}
+
 // PostEncrypted 发送加密的 POST 请求，并自动解密响应
 func (c *Client) PostEncrypted(path string, body interface{}) (*http.Response, error) {
 	if err := c.ensureCrypto(); err != nil {

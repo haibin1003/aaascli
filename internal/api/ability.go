@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"net/url"
 )
 
 // AbilityService 能力服务
@@ -76,7 +75,8 @@ type AbilityDetailResponse struct {
 	Code   string `json:"code"`
 	Msg    string `json:"msg"`
 	Data   struct {
-		Product AbilityDetail `json:"product"`
+		Product         AbilityDetail `json:"product"`
+		CapacityDefine  AbilityDetail `json:"capacityDefineBean"`
 	} `json:"data"`
 }
 
@@ -176,8 +176,14 @@ func containsCI(a, b string) bool {
 
 // GetDetail 获取能力详情
 func (s *AbilityService) GetDetail(abilityID string) (*AbilityDetail, error) {
-	body := fmt.Sprintf("capacityId=%s", url.QueryEscape(abilityID))
-	resp, err := s.client.Post("/openportalsrv/rest/portalmain/productMgr/qryProduct", body)
+	boundary := "----WebKitFormBoundaryoWjo5w3HbKA3wKEa"
+	body := fmt.Sprintf(
+		"------%s\r\nContent-Disposition: form-data; name=\"capacityId\"\r\n\r\n%s\r\n------%s--\r\n",
+		boundary, abilityID, boundary,
+	)
+	contentType := fmt.Sprintf("multipart/form-data; boundary=----%s", boundary)
+
+	resp, err := s.client.PostMultipart("/openportalsrv/rest/portalmain/capacityMgr/initCapacityInfo", contentType, []byte(body))
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
@@ -191,7 +197,12 @@ func (s *AbilityService) GetDetail(abilityID string) (*AbilityDetail, error) {
 		return nil, fmt.Errorf("API error [%s]: %s", result.Code, result.Msg)
 	}
 
-	return &result.Data.Product, nil
+	// 优先使用 capacityDefineBean，回退到 product
+	detail := result.Data.CapacityDefine
+	if detail.ID == "" && detail.Name == "" {
+		detail = result.Data.Product
+	}
+	return &detail, nil
 }
 
 // OrderAbility 订购能力
