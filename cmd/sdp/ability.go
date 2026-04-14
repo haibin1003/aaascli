@@ -22,7 +22,7 @@ var abilityCmd = &cobra.Command{
 
 var abilityListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "查询能力列表",
+	Short: "查询全部能力列表",
 	Run: func(cmd *cobra.Command, args []string) {
 		listAbilities()
 	},
@@ -58,7 +58,7 @@ var abilityOrderCmd = &cobra.Command{
 
 var abilityMyCmd = &cobra.Command{
 	Use:   "my",
-	Short: "查看我的能力",
+	Short: "查看我的能力（已订购）",
 	Run: func(cmd *cobra.Command, args []string) {
 		listMyAbilities()
 	},
@@ -88,11 +88,11 @@ func listAbilities() {
 			return nil, err
 		}
 		service := api.NewAbilityService(ctx.Client)
-		resp, err := service.List(abilityPage, abilitySize)
+		items, err := service.ListAll()
 		if err != nil {
 			return nil, fmt.Errorf("查询失败: %w", err)
 		}
-		return formatAbilityList(resp), nil
+		return formatAbilitySlice(items, abilityPage, abilitySize), nil
 	}, common.ExecuteOptions{
 		DebugMode:   debugMode,
 		Insecure:    insecure,
@@ -108,11 +108,11 @@ func searchAbilities() {
 			return nil, err
 		}
 		service := api.NewAbilityService(ctx.Client)
-		resp, err := service.Search(abilityKeyword, abilityPage, abilitySize)
+		items, err := service.Search(abilityKeyword)
 		if err != nil {
 			return nil, fmt.Errorf("搜索失败: %w", err)
 		}
-		return formatAbilityList(resp), nil
+		return formatAbilitySlice(items, abilityPage, abilitySize), nil
 	}, common.ExecuteOptions{
 		DebugMode:   debugMode,
 		Insecure:    insecure,
@@ -175,7 +175,7 @@ func listMyAbilities() {
 		if err != nil {
 			return nil, fmt.Errorf("查询失败: %w", err)
 		}
-		return formatAbilityList(resp), nil
+		return formatAbilityProductList(resp), nil
 	}, common.ExecuteOptions{
 		DebugMode:   debugMode,
 		Insecure:    insecure,
@@ -185,7 +185,46 @@ func listMyAbilities() {
 	})
 }
 
-func formatAbilityList(resp *api.AbilityListResponse) map[string]interface{} {
+func formatAbilitySlice(items []api.Ability, page, size int) map[string]interface{} {
+	if items == nil {
+		items = []api.Ability{}
+	}
+	total := len(items)
+	start := (page - 1) * size
+	end := start + size
+	if start > total {
+		start = total
+	}
+	if end > total {
+		end = total
+	}
+	pageItems := items[start:end]
+
+	var formatted []map[string]interface{}
+	for _, a := range pageItems {
+		formatted = append(formatted, map[string]interface{}{
+			"id":       a.ID,
+			"name":     a.Name,
+			"code":     a.Code,
+			"desc":     a.Desc,
+			"provider": a.Provider,
+			"status":   a.Status,
+			"category": a.CatalogName,
+		})
+	}
+
+	return map[string]interface{}{
+		"items": formatted,
+		"pagination": map[string]interface{}{
+			"page":  page,
+			"size":  size,
+			"total": total,
+			"pages": (total + size - 1) / size,
+		},
+	}
+}
+
+func formatAbilityProductList(resp *api.AbilityListResponse) map[string]interface{} {
 	if resp.Data.ProductActionList == nil {
 		resp.Data.ProductActionList = []api.Ability{}
 	}
