@@ -200,7 +200,7 @@ func formatAbilitySlice(items []api.Ability, page, size int) map[string]interfac
 	}
 	pageItems := items[start:end]
 
-	var formatted []map[string]interface{}
+	formatted := make([]map[string]interface{}, 0)
 	for _, a := range pageItems {
 		formatted = append(formatted, map[string]interface{}{
 			"id":       a.ID,
@@ -228,7 +228,7 @@ func formatAbilityProductList(resp *api.AbilityListResponse) map[string]interfac
 	if resp.Data.ProductActionList == nil {
 		resp.Data.ProductActionList = []api.Ability{}
 	}
-	var items []map[string]interface{}
+	items := make([]map[string]interface{}, 0)
 	for _, a := range resp.Data.ProductActionList {
 		items = append(items, map[string]interface{}{
 			"id":       a.ID,

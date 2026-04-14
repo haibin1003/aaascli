@@ -97,7 +97,7 @@ func formatAppList(resp *api.AppAuthListResponse) map[string]interface{} {
 	if resp.Data.AuthorizedList == nil {
 		resp.Data.AuthorizedList = []api.AppAuth{}
 	}
-	var items []map[string]interface{}
+	items := make([]map[string]interface{}, 0)
 	for _, a := range resp.Data.AuthorizedList {
 		items = append(items, map[string]interface{}{
 			"appName":        a.AppName,

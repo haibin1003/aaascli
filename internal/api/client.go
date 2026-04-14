@@ -9,6 +9,9 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 const (
@@ -263,7 +266,7 @@ func (c *Client) PostEncrypted(path string, body interface{}) (*http.Response, e
 	return resp, nil
 }
 
-// ParseJSON 解析 JSON 响应
+// ParseJSON 解析 JSON 响应，自动检测并转换 GBK 编码
 func ParseJSON(resp *http.Response, v interface{}) error {
 	defer resp.Body.Close()
 
@@ -276,8 +279,29 @@ func ParseJSON(resp *http.Response, v interface{}) error {
 		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
 	}
 
-	if err := json.Unmarshal(body, v); err != nil {
+	if err := tryUnmarshalJSON(body, v); err != nil {
 		return fmt.Errorf("parse JSON failed: %w, body: %s", err, string(body))
+	}
+
+	return nil
+}
+
+// tryUnmarshalJSON 尝试解析 JSON，如果检测到 GBK 编码则自动转换
+func tryUnmarshalJSON(body []byte, v interface{}) error {
+	if err := json.Unmarshal(body, v); err != nil {
+		return err
+	}
+
+	// 检测是否包含 Unicode replacement character（说明原始 body 是 GBK 编码）
+	tmp, _ := json.Marshal(v)
+	if strings.Contains(string(tmp), "\uFFFD") || strings.Contains(string(tmp), "�") {
+		decoder := simplifiedchinese.GBK.NewDecoder()
+		utf8Bytes, _, err := transform.Bytes(decoder, body)
+		if err == nil {
+			if err := json.Unmarshal(utf8Bytes, v); err == nil {
+				return nil
+			}
+		}
 	}
 
 	return nil

@@ -16,6 +16,9 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 // CryptoContext 保存加密通信所需的密钥对和平台公钥
@@ -253,6 +256,17 @@ func (c *CryptoContext) DecryptResponse(body string) (string, error) {
 	var innerStr string
 	if err := json.Unmarshal([]byte(decryptedData), &innerStr); err == nil {
 		decryptedData = innerStr
+	}
+
+	// 如果解密后的 data 是 GBK 编码，尝试转换为 UTF-8
+	decoder := simplifiedchinese.GBK.NewDecoder()
+	utf8Data, _, err := transform.Bytes(decoder, []byte(decryptedData))
+	if err == nil {
+		// 验证转换后的是否是合法 JSON
+		var test interface{}
+		if json.Unmarshal(utf8Data, &test) == nil {
+			decryptedData = string(utf8Data)
+		}
 	}
 
 	return decryptedData, nil
