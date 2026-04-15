@@ -23,19 +23,16 @@ section { padding: 72px 0; }
 .bg-light { background: var(--light); }
 .bg-gradient { background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%); }
 
-/* Big number cards */
 .big-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 48px; }
 .big-stat { background: white; border-radius: 16px; padding: 32px 24px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
 .big-stat .num { font-size: 42px; font-weight: 800; background: linear-gradient(135deg, var(--primary), #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: block; margin-bottom: 8px; }
 .big-stat .label { font-size: 14px; color: var(--gray); font-weight: 500; }
 
-/* Pain points */
 .pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 48px; }
 .pain-card { background: white; border-radius: 14px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid #ef4444; }
 .pain-card h3 { font-size: 18px; margin-bottom: 12px; color: #b91c1c; }
 .pain-card p { color: var(--gray); font-size: 15px; line-height: 1.7; }
 
-/* Comparison table */
 .compare-table { width: 100%; border-collapse: separate; border-spacing: 0; background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin: 32px 0; }
 .compare-table th, .compare-table td { padding: 18px 24px; text-align: left; font-size: 15px; }
 .compare-table thead { background: #eff6ff; }
@@ -46,13 +43,11 @@ section { padding: 72px 0; }
 .tag-bad { background: #fee2e2; color: #991b1b; }
 .tag-good { background: #dcfce7; color: #166534; }
 
-/* Solution banner */
 .solution-banner { background: linear-gradient(90deg, #ecfdf5 0%, #d1fae5 100%); border-radius: 16px; padding: 40px; display: flex; align-items: center; gap: 32px; border: 1px solid #a7f3d0; }
 .solution-icon { width: 80px; height: 80px; background: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; flex-shrink: 0; }
 .solution-text h3 { font-size: 24px; margin-bottom: 8px; color: #065f46; }
 .solution-text p { color: #047857; font-size: 16px; line-height: 1.7; }
 
-/* Architecture */
 .arch-diagram { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 32px; }
 .arch-layers { display: flex; flex-direction: column; gap: 16px; }
 .arch-layer { display: flex; align-items: center; gap: 16px; padding: 20px 24px; border-radius: 10px; font-size: 15px; }
@@ -68,13 +63,31 @@ section { padding: 72px 0; }
 .arch-highlight .num { font-size: 32px; font-weight: 700; color: var(--primary); display: block; margin-bottom: 4px; }
 .arch-highlight .label { font-size: 14px; color: var(--gray); }
 
-/* Tech challenge cards */
+/* Trinity section */
+.trinity-wrap { display: flex; flex-direction: column; align-items: center; gap: 32px; }
+.trinity-diagram { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; max-width: 900px; width: 100%; }
+.trinity-center { width: 180px; height: 180px; background: linear-gradient(135deg, var(--primary), #7c3aed); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; box-shadow: 0 12px 24px rgba(37,99,235,0.25); z-index: 2; }
+.trinity-center .icon { font-size: 36px; margin-bottom: 6px; }
+.trinity-center .text { font-size: 16px; font-weight: 700; line-height: 1.3; }
+.trinity-item { flex: 1; min-width: 220px; max-width: 260px; background: white; border-radius: 14px; padding: 24px; border: 1px solid var(--border); position: relative; }
+.trinity-item::before { content: ""; position: absolute; top: 50%; width: 24px; height: 3px; background: var(--primary); }
+.trinity-item.left::before { right: -24px; }
+.trinity-item.right::before { left: -24px; }
+.trinity-item h4 { font-size: 16px; margin-bottom: 10px; color: var(--primary-dark); }
+.trinity-item ul { list-style: none; }
+.trinity-item li { padding: 4px 0; padding-left: 18px; position: relative; font-size: 13px; color: var(--gray); }
+.trinity-item li::before { content: "→"; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
+.trinity-arrows { display: none; }
+.trinity-desc { background: white; border-radius: 14px; padding: 28px 32px; border: 1px solid var(--border); max-width: 900px; }
+.trinity-desc h4 { font-size: 18px; margin-bottom: 12px; color: var(--dark); }
+.trinity-desc p { color: var(--gray); font-size: 15px; line-height: 1.8; }
+.trinity-desc p + p { margin-top: 12px; }
+
 .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 32px; }
 .tech-card { background: white; border-radius: 12px; padding: 24px; border-top: 4px solid #7c3aed; }
 .tech-card h4 { font-size: 16px; margin-bottom: 10px; color: #5b21b6; }
 .tech-card p { font-size: 14px; color: var(--gray); line-height: 1.7; }
 
-/* Features */
 .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
 .feature-card { background: white; border-radius: 14px; padding: 32px; border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s; }
 .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.1); }
@@ -84,7 +97,6 @@ section { padding: 72px 0; }
 .feature-card li { padding: 6px 0; padding-left: 20px; position: relative; color: var(--gray); font-size: 14px; }
 .feature-card li::before { content: "✓"; position: absolute; left: 0; color: var(--secondary); font-weight: 700; }
 
-/* Scenario cards */
 .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
 .scenario-card { background: white; border-radius: 14px; padding: 28px; border-left: 4px solid var(--primary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 .scenario-card h4 { font-size: 18px; margin-bottom: 12px; }
@@ -92,7 +104,10 @@ section { padding: 72px 0; }
 .scenario-card .tag-item { display: inline-block; background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-right: 6px; margin-bottom: 6px; }
 .scenario-card p { color: var(--gray); font-size: 14px; line-height: 1.7; }
 
-/* Usage flow */
+.scenario-flow { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.scenario-flow .sf-box { background: #eff6ff; color: #1e40af; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+.scenario-flow .sf-arrow { color: var(--gray); font-size: 14px; }
+
 .flow-steps { display: flex; justify-content: space-between; gap: 16px; position: relative; margin-top: 24px; }
 .flow-steps::before { content: ""; position: absolute; top: 28px; left: 10%; right: 10%; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary)); z-index: 0; }
 .flow-step { flex: 1; text-align: center; position: relative; z-index: 1; }
@@ -100,25 +115,21 @@ section { padding: 72px 0; }
 .flow-step h4 { font-size: 16px; margin-bottom: 6px; }
 .flow-step p { font-size: 13px; color: var(--gray); }
 
-/* Results */
 .result-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
 .result-card { background: white; border-radius: 14px; padding: 28px; border-top: 4px solid var(--primary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
 .result-card h3 { font-size: 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
 .result-card p { color: var(--gray); font-size: 14px; line-height: 1.8; }
 .result-tag { display: inline-block; background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-top: 12px; }
 
-/* Stats bar */
 .stats-bar { background: var(--dark); color: white; padding: 56px 0; }
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 32px; text-align: center; }
 .stat-item .num { font-size: 44px; font-weight: 700; color: var(--accent); display: block; }
 .stat-item .label { font-size: 14px; opacity: 0.8; margin-top: 4px; }
 
-/* Quote */
 .quote-section { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 72px 0; text-align: center; }
 .quote-text { font-size: 26px; font-weight: 600; color: #0c4a6e; max-width: 800px; margin: 0 auto 24px; line-height: 1.5; }
 .quote-author { color: var(--gray); font-size: 15px; }
 
-/* Timeline */
 .timeline { position: relative; margin-top: 40px; }
 .timeline::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: var(--border); transform: translateX(-50%); }
 .timeline-item { display: flex; justify-content: flex-end; padding-right: 30px; position: relative; width: 50%; margin-bottom: 32px; }
@@ -129,11 +140,27 @@ section { padding: 72px 0; }
 .timeline-content h4 { font-size: 16px; margin-bottom: 6px; }
 .timeline-content p { font-size: 14px; color: var(--gray); }
 
-/* Footer */
 footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: center; font-size: 14px; }
 .code-block { background: #0f172a; color: #e2e8f0; padding: 20px 24px; border-radius: 10px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 13px; overflow-x: auto; line-height: 1.6; }
 .code-block .comment { color: #64748b; }
 .code-block .cmd { color: #7dd3fc; }
+
+.zero-intrude-banner { background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 28px 32px; border: 1px solid #bfdbfe; margin: 32px 0; display: flex; align-items: center; gap: 20px; }
+.zero-intrude-banner .icon { width: 56px; height: 56px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; flex-shrink: 0; }
+.zero-intrude-banner h4 { font-size: 18px; color: #1e40af; margin-bottom: 6px; }
+.zero-intrude-banner p { color: #1e3a8a; font-size: 15px; line-height: 1.7; }
+
+@media print {
+  @page { margin: 16mm 14mm; size: A4; }
+  section { page-break-before: always; padding: 32px 0; }
+  section:first-of-type { page-break-before: auto; }
+  .feature-card, .scenario-card, .result-card, .pain-card, .arch-highlight, .timeline-content, .flow-step, .trinity-item, .trinity-desc, .trinity-center, .fusion-banner, .zero-intrude-banner, .solution-banner { page-break-inside: avoid; }
+  h2, h3, h4 { page-break-after: avoid; }
+  ul, ol, .code-block { page-break-inside: avoid; }
+  .compare-table { page-break-inside: auto; }
+  .compare-table tr { page-break-inside: avoid; }
+}
+
 @media (max-width: 768px) {
   .cover h1 { font-size: 32px; }
   .flow-steps { flex-direction: column; }
@@ -142,6 +169,8 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
   .timeline::before { left: 20px; }
   .timeline-item, .timeline-item:nth-child(even) { width: 100%; left: 0; padding-left: 50px; padding-right: 0; justify-content: flex-start; }
   .timeline-dot, .timeline-item:nth-child(even) .timeline-dot { left: 12px; right: auto; }
+  .trinity-item.left::before, .trinity-item.right::before { display: none; }
+  .trinity-diagram { flex-direction: column; align-items: center; }
 }
 </style>
 </head>
@@ -152,7 +181,7 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
   <div class="container">
     <div class="cover-badge">数字化转型 / AI 赋能 / 企业能力开放</div>
     <h1>山东能力平台 CLI 助手</h1>
-    <p class="cover-subtitle">让 AI 从「只能建议」升级为「可以直接执行」</p>
+    <p class="cover-subtitle">让 AI 既能基于能力开放平台做智能建议，也能直接执行查询、订购与授权</p>
     <div class="cover-meta">
       <span>2026年4月</span>
       <span>项目汇报</span>
@@ -186,50 +215,20 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
         <p>平台汇聚了 325+ 业务能力和 3800+ 具体 API 服务，业务人员需要在众多分类中逐层翻阅，纯人工浏览查找一个合适的能力往往耗费数小时，且容易遗漏更优选项。</p>
       </div>
       <div class="pain-card">
-        <h3>AI 价值难以真正落地</h3>
-        <p>AI 拥有强大的信息整合、逻辑推理和代码生成能力，但缺乏直接访问企业内部平台的通道，导致「有脑子、没手脚」，最终沦为一个只能给建议的聊天工具。</p>
+        <h3>海量能力与需求难以匹配</h3>
+        <p>面对 325+ 业务能力和 3800+ API，业务人员不清楚如何根据自身需求筛选合适的能力，不知道哪些能力可以组合使用，更不清楚「能力」与「服务」的区别以及各自的适用场景。</p>
       </div>
-    </div>
-    
-    <h3 style="font-size:20px; margin:48px 0 20px; text-align:center; color:var(--dark);">使用前 vs 使用后对比</h3>
-    <table class="compare-table">
-      <thead>
-        <tr><th>场景</th><th>使用前</th><th>使用后</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>查找一个业务能力</td>
-          <td><span class="tag tag-bad">人工逐页浏览 1-2 小时</span></td>
-          <td><span class="tag tag-good">AI 秒级搜索并返回结构化结果</span></td>
-        </tr>
-        <tr>
-          <td>了解接口调用方式</td>
-          <td><span class="tag tag-bad">阅读冗长文档，手动拼凑代码</span></td>
-          <td><span class="tag tag-good">AI 自动生成 Python/Java/Go 代码</span></td>
-        </tr>
-        <tr>
-          <td>业务方案设计</td>
-          <td><span class="tag tag-bad">凭经验拍脑袋选型</span></td>
-          <td><span class="tag tag-good">AI 基于全量能力目录推荐最优组合</span></td>
-        </tr>
-        <tr>
-          <td>新员工/新场景学习</td>
-          <td><span class="tag tag-bad">摸索周期长，知识难以沉淀</span></td>
-          <td><span class="tag tag-good">内置知识库直接给出最佳实践</span></td>
-        </tr>
-        <tr>
-          <td>系统改造风险</td>
-          <td><span class="tag tag-bad">需要平台方配合改接口/加权限</span></td>
-          <td><span class="tag tag-good">纯客户端实现，对原系统零侵入</span></td>
-        </tr>
-      </tbody>
-    </table>
-    
-    <div style="background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 28px 32px; border: 1px solid #bfdbfe; margin-bottom: 24px; display: flex; align-items: center; gap: 20px;">
-      <div style="width: 56px; height: 56px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; color: white; flex-shrink: 0;">🛡️</div>
-      <div>
-        <h4 style="font-size: 18px; color: #1e40af; margin-bottom: 6px;">关键优势：对原有系统零侵入</h4>
-        <p style="color: #1e3a8a; font-size: 15px; line-height: 1.7;">本项目无需修改平台后端一行代码、无需新增接口、无需调整数据库或网络策略。所有能力均通过纯客户端方式（命令行 + 浏览器插件）实现，对现有山东能力开放平台完全透明，风险可控，即插即用。</p>
+      <div class="pain-card">
+        <h3>拿到接口不会调用</h3>
+        <p>即使找到了合适的 API 服务，业务人员也需要阅读冗长的接口文档，手动理解请求参数、响应格式和加密方式，拼凑调用代码的门槛高、耗时久、出错率高。</p>
+      </div>
+      <div class="pain-card">
+        <h3>能力与服务的概念混淆</h3>
+        <p>很多人对「能力（Ability）」和「服务（Service/API）」的层级关系、订购流程、授权方式一知半解，不清楚能力是对外项目使用还是内部系统调用，导致订购错误、授权遗漏、资源浪费。</p>
+      </div>
+      <div class="pain-card">
+        <h3>AI 价值难以真正落地</h3>
+        <p>AI 拥有强大的信息整合、逻辑推理和代码生成能力，但缺乏直接访问企业内部平台的通道，导致「有脑子、没手脚」；同时缺少规范约束，容易胡乱推荐、混淆概念，最终沦为一个不可靠的聊天工具。</p>
       </div>
     </div>
     
@@ -237,13 +236,13 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
       <div class="solution-icon">💡</div>
       <div class="solution-text">
         <h3>核心解决思路</h3>
-        <p>为 AI 助手打造一款专用的命令行客户端（CLI），通过深入研究平台前端加密与通信机制，完整还原 RSA+AES 混合加密协议，让 AI 能够直接调用平台真实接口。AI 从此可以查询能力目录、检索 API 服务、查看接口详情，并基于返回数据主动生成调用代码和完整业务方案。</p>
+        <p>为 AI 助手打造一款专用的命令行客户端（CLI），通过深入研究平台前端加密与通信机制，完整还原 RSA+AES 混合加密协议，让 AI 能够直接调用平台真实接口。同时，配套内置知识库、AI 使用手册、能力订购流程规范和 Prompt 模板，为 AI 提供「工具 + 知识 + 约束」三位一体的操作系统。</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- 二、架构与技术突破 -->
+<!-- 二、架构设计与技术突破 -->
 <section class="bg-light">
   <div class="container">
     <div class="section-header">
@@ -314,12 +313,95 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
   </div>
 </section>
 
-<!-- 三、核心功能 -->
+<!-- 三、三位一体：AI 操作系统 -->
 <section>
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">03 / 核心功能</h2>
-      <p class="section-subtitle">五大模块，覆盖能力查询、服务检索、知识赋能和智能辅助</p>
+      <h2 class="section-title">03 / AI 操作系统：工具 + 知识 + 约束</h2>
+      <p class="section-subtitle">不仅给 AI 递锤子，还教它怎么盖房子、给它画好施工图</p>
+    </div>
+    
+    <div class="trinity-wrap">
+      <div class="trinity-diagram">
+        <div class="trinity-item left">
+          <h4>🔧 工具层（CLI）</h4>
+          <ul>
+            <li>直接查询 325+ 能力、3800+ API</li>
+            <li>自动完成加密、认证、转码</li>
+            <li>支持能力订购、服务订购、授权</li>
+            <li>生成可直接运行的调用代码</li>
+          </ul>
+        </div>
+        <div class="trinity-center">
+          <div class="icon">🧠</div>
+          <div class="text">AI<br>助手</div>
+        </div>
+        <div class="trinity-item right">
+          <h4>📚 知识层（Knowledge）</h4>
+          <ul>
+            <li>6 篇内置知识库文档（go:embed）</li>
+            <li>典型业务场景和组合方案</li>
+            <li>能力 vs 服务概念辨析</li>
+            <li>Python/Java/Go/cURL 代码模板</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div style="display:flex; justify-content:center; width:100%; max-width:900px; margin:8px 0;">
+        <div class="trinity-item" style="max-width:500px; width:100%; text-align:center;">
+          <h4>🎯 约束层（Skills & Prompt）</h4>
+          <ul style="display:inline-block; text-align:left;">
+            <li>AI 使用手册：明确命令边界和行为规范</li>
+            <li>Prompt 模板：固定场景下的决策树约束</li>
+            <li>订购流程规范：BOMC 工单、授权路径标准化</li>
+            <li>防止臆造参数、混淆概念、胡乱推荐</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="trinity-desc">
+        <h4>为什么「三位一体」是核心亮点？</h4>
+        <p><strong>只有工具，没有知识，</strong>AI 每次都要从零推理，回答质量不稳定，新人上手慢；<strong>只有知识，没有工具，</strong>AI 只能纸上谈兵，无法验证和落地；<strong>工具+知识，没有约束，</strong>AI 容易「幻觉」——臆造参数、混淆能力与服务概念、跳过关键授权步骤。</p>
+        <p>我们的方案将<strong> CLI 工具、内置知识库、规范约束</strong>融为一体：AI 先用知识库理解业务场景和能力差异，再用 CLI 直接查询和验证，最后被 Prompt 和流程规范约束在正确的决策路径内。三者相互补强，形成一个可执行、可验证、不易出错的<strong>AI 操作系统</strong>。</p>
+      </div>
+    </div>
+    
+    <div class="zero-intrude-banner">
+      <div class="icon">🛡️</div>
+      <div>
+        <h4>关键优势：对原有系统零侵入</h4>
+        <p>本项目无需修改平台后端一行代码、无需新增接口、无需调整数据库或网络策略。所有能力均通过纯客户端方式（命令行 + 浏览器插件）实现，对现有山东能力开放平台完全透明，风险可控，即插即用。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 四、核心功能 -->
+<section class="bg-light">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">04 / 核心功能</h2>
+      <p class="section-subtitle">七大模块，覆盖能力查询、服务检索、知识赋能、订购授权和智能辅助</p>
+    </div>
+    
+    <div class="fusion-banner" style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:28px 32px; margin-bottom:36px;">
+      <h4 style="text-align:center; color:#0369a1; margin-bottom:20px;">🔄 工具 × 知识 × 约束 融合示意：每个 CLI 调用都自带「大脑」和「边界」</h4>
+      <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; align-items:stretch;">
+        <div style="flex:1; min-width:200px; max-width:280px; background:#fff; border-radius:10px; padding:18px; border-left:4px solid #3b82f6;">
+          <h5 style="margin:0 0 10px; color:#1d4ed8;">1. 工具层（CLI）</h5>
+          <p style="margin:0; font-size:13px; color:#475569;">ability search / service view / order / auth-ability ...<br>直接调用平台真实接口，获取结构化数据。</p>
+        </div>
+        <div style="flex:0 0 36px; display:flex; align-items:center; justify-content:center; font-size:22px; color:#94a3b8;">→</div>
+        <div style="flex:1; min-width:200px; max-width:300px; background:#fff; border-radius:10px; padding:18px; border-left:4px solid #f59e0b;">
+          <h5 style="margin:0 0 10px; color:#b45309;">2. 知识层 & 约束层</h5>
+          <p style="margin:0; font-size:13px; color:#475569;"><strong>知识库</strong>：自动引用场景方案、代码模板、故障排查<br><strong>约束层</strong>：按 Prompt 决策树执行，防止臆造参数、混淆概念</p>
+        </div>
+        <div style="flex:0 0 36px; display:flex; align-items:center; justify-content:center; font-size:22px; color:#94a3b8;">→</div>
+        <div style="flex:1; min-width:200px; max-width:280px; background:#fff; border-radius:10px; padding:18px; border-left:4px solid #10b981;">
+          <h5 style="margin:0 0 10px; color:#047857;">3. 输出结果</h5>
+          <p style="margin:0; font-size:13px; color:#475569;">结构化推荐 / 调用代码 / 执行订购 / 审批跟踪<br>可执行、可验证、不易出错。</p>
+        </div>
+      </div>
     </div>
     
     <div class="feature-grid">
@@ -357,6 +439,17 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
         </ul>
       </div>
       <div class="feature-card">
+        <div class="feature-icon" style="background:#fce7f3;">🛒</div>
+        <h3>订购与授权（Order & Auth）</h3>
+        <ul>
+          <li>能力订购：sdp ability order &lt;ability-id&gt;</li>
+          <li>应用授权能力：sdp app auth-ability（支持 BOMC 工单关联）</li>
+          <li>服务订购：sdp service order（一步完成订购+授权）</li>
+          <li>查询申请进展：sdp order list（跟踪审批状态）</li>
+          <li>自动填充应用名称、能力名称、流控配额参数</li>
+        </ul>
+      </div>
+      <div class="feature-card">
         <div class="feature-icon" style="background:#f3e8ff;">🔐</div>
         <h3>认证与辅助（Auth & Helper）</h3>
         <ul>
@@ -367,15 +460,124 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
           <li>格式化 JSON 输出，便于阅读</li>
         </ul>
       </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#e0f2fe;">🎯</div>
+        <h3>AI 规范约束（Skills & Prompt）</h3>
+        <ul>
+          <li>内置 6 篇知识库文档，固化最佳实践</li>
+          <li>AI 使用手册（ai-usage-guide.md）</li>
+          <li>用户提示词模板（user-prompt-template.md）</li>
+          <li>能力/服务订购流程决策树约束</li>
+          <li>防止 AI 混淆概念、胡乱推荐、臆造参数</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- 四、典型应用场景 -->
+<!-- 五、项目结构与交付物 -->
 <section class="bg-light">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">04 / 典型应用场景</h2>
+      <h2 class="section-title">05 / 项目结构与交付物</h2>
+      <p class="section-subtitle">不仅是 CLI 二进制，更是一套完整的 AI 赋能资产</p>
+    </div>
+    
+    <div style="display:flex; gap:32px; flex-wrap:wrap; align-items:flex-start;">
+      <!-- 目录树 -->
+      <div style="flex:1; min-width:320px; background:#0f172a; color:#e2e8f0; border-radius:12px; padding:24px; font-family:Consolas,monospace; font-size:13px; line-height:1.7;">
+        <div style="color:#94a3b8;">sdp-package/</div>
+        <div style="padding-left:18px;">├── <span style="color:#38bdf8;">sdp-windows-x64.exe</span> <span style="color:#64748b;"># 6 平台二进制</span></div>
+        <div style="padding-left:18px;">├── <span style="color:#38bdf8;">sdp-linux-x64</span></div>
+        <div style="padding-left:18px;">├── <span style="color:#38bdf8;">sdp-darwin-arm64</span></div>
+        <div style="padding-left:18px;">├── <span style="color:#fbbf24;">docs/</span></div>
+        <div style="padding-left:36px;">│   ├── <span style="color:#a78bfa;">knowledge/</span> <span style="color:#64748b;"># 内置知识库（6篇Markdown）</span></div>
+        <div style="padding-left:36px;">│   ├── <span style="color:#f472b6;">ai-usage-guide.md</span> <span style="color:#64748b;"># AI使用手册</span></div>
+        <div style="padding-left:36px;">│   ├── <span style="color:#f472b6;">user-prompt-template.md</span> <span style="color:#64748b;"># Prompt约束模板</span></div>
+        <div style="padding-left:36px;">│   ├── <span style="color:#f472b6;">presentation-report.html</span> <span style="color:#64748b;"># 项目汇报材料</span></div>
+        <div style="padding-left:36px;">│   └── <span style="color:#f472b6;">open-source-platform-proposal.html</span></div>
+        <div style="padding-left:18px;">├── <span style="color:#fbbf24;">skills/</span> <span style="color:#64748b;"># 可复用技能模块</span></div>
+        <div style="padding-left:18px;">├── <span style="color:#fbbf24;">sdp-login-helper/</span> <span style="color:#64748b;"># Chrome插件</span></div>
+        <div style="padding-left:18px;">└── README.md</div>
+      </div>
+      
+      <!-- 说明卡片 -->
+      <div style="flex:1.5; min-width:320px;">
+        <div class="result-card" style="margin-bottom:16px;">
+          <h4>🧠 AI 知识资产</h4>
+          <p><code>docs/knowledge/</code> 包含 6 篇业务指南和代码模板；<code>ai-usage-guide.md</code> 明确命令边界和行为规范；<code>user-prompt-template.md</code> 提供固定场景下的决策树约束。AI 不需要从零学习平台规则。</p>
+        </div>
+        <div class="result-card" style="margin-bottom:16px;">
+          <h4>🛠️ 可执行工具链</h4>
+          <p>6 个跨平台二进制文件 + Chrome 登录插件，构成完整的「查询-订购-授权」工具链。AI 从「只能建议」升级为「可以直接动手执行」。</p>
+        </div>
+        <div class="result-card">
+          <h4>📦 纯客户端交付</h4>
+          <p>所有资产打包在一个 ZIP 中，无需服务器部署、无需改接口、无需配数据库。解压即可用，对原系统完全透明。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 六、使用前后对比 -->
+<section>
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">06 / 使用前后对比</h2>
+      <p class="section-subtitle">从「动嘴」到「动手」，从「混乱」到「规范」</p>
+    </div>
+    
+    <table class="compare-table">
+      <thead>
+        <tr><th>场景</th><th>使用前</th><th>使用后</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>查找一个业务能力</td>
+          <td><span class="tag tag-bad">人工逐页浏览 1-2 小时</span></td>
+          <td><span class="tag tag-good">AI 秒级搜索并返回结构化结果</span></td>
+        </tr>
+        <tr>
+          <td>了解接口调用方式</td>
+          <td><span class="tag tag-bad">阅读冗长文档，手动拼凑代码</span></td>
+          <td><span class="tag tag-good">AI 自动生成 Python/Java/Go 代码</span></td>
+        </tr>
+        <tr>
+          <td>业务方案设计</td>
+          <td><span class="tag tag-bad">凭经验拍脑袋选型</span></td>
+          <td><span class="tag tag-good">AI 基于全量能力目录推荐最优组合</span></td>
+        </tr>
+        <tr>
+          <td>新员工/新场景学习</td>
+          <td><span class="tag tag-bad">摸索周期长，知识难以沉淀</span></td>
+          <td><span class="tag tag-good">内置知识库直接给出最佳实践</span></td>
+        </tr>
+        <tr>
+          <td>能力/服务概念辨析</td>
+          <td><span class="tag tag-bad">概念混淆，订购和授权频频出错</span></td>
+          <td><span class="tag tag-good">内置知识库+流程规范，AI 按标准执行</span></td>
+        </tr>
+        <tr>
+          <td>AI 行为可靠性</td>
+          <td><span class="tag tag-bad">缺少约束，容易胡乱推荐</span></td>
+          <td><span class="tag tag-good">Skills + 知识库 + 订购规范三重约束</span></td>
+        </tr>
+        <tr>
+          <td>系统改造风险</td>
+          <td><span class="tag tag-bad">需要平台方配合改接口/加权限</span></td>
+          <td><span class="tag tag-good">纯客户端实现，对原系统零侵入</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 七、典型应用场景 -->
+<section class="bg-light">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">07 / 典型应用场景</h2>
       <p class="section-subtitle">从查询到方案，从接口到代码，AI 全程参与</p>
     </div>
     
@@ -387,6 +589,17 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
         </div>
         <h4>场景一：智慧景区客流预警</h4>
         <p><strong>用户诉求：</strong>想在景区实现实时人数监测和超员预警。<br><strong>AI 动作：</strong>查询「电子围栏」「大数据短信触达」能力，返回能力ID、接口定义和调用示例。<br><strong>输出价值：</strong>30 秒内输出完整能力组合方案和调用代码，无需用户手动翻页查找。</p>
+        <div class="scenario-flow">
+          <div class="sf-box">搜索能力</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">查看详情</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">查看服务</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">生成代码</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">查询知识库</div>
+        </div>
       </div>
       <div class="scenario-card">
         <div class="tags">
@@ -395,6 +608,15 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
         </div>
         <h4>场景二：精准短信触达</h4>
         <p><strong>用户诉求：</strong>需要向特定区域的人群发送政务通知。<br><strong>AI 动作：</strong>检索「云信」位置短信能力，查看服务详情中的 requestExample，生成可直接运行的 Python 调用代码。<br><strong>输出价值：</strong>业务人员无需阅读复杂文档，复制代码即可调试。</p>
+        <div class="scenario-flow">
+          <div class="sf-box">需求描述</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">AI 搜索能力</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">获取接口示例</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">生成 Python 代码</div>
+        </div>
       </div>
       <div class="scenario-card">
         <div class="tags">
@@ -403,16 +625,44 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
         </div>
         <h4>场景三：机器视觉能力选型</h4>
         <p><strong>用户诉求：</strong>做身份证识别和发票报销自动化。<br><strong>AI 动作：</strong>搜索「OCR」「凭证识别」相关能力，整理成对比表格，并给出「核心能力 + 辅助能力」的接入建议。<br><strong>输出价值：</strong>避免选型遗漏，缩短技术预研周期。</p>
+        <div class="scenario-flow">
+          <div class="sf-box">需求输入</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">AI 检索对比</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">输出能力表格</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">给出接入建议</div>
+        </div>
+      </div>
+      <div class="scenario-card">
+        <div class="tags">
+          <span class="tag-item">订购授权</span>
+          <span class="tag-item">规范约束</span>
+        </div>
+        <h4>场景四：能力订购与授权全流程</h4>
+        <p><strong>用户诉求：</strong>需要订购「地图坐标转换能力」并授权给应用。<br><strong>AI 动作：</strong>按 Prompt 模板决策树判断为「能力订购路径」→ 执行 ability order → 询问 BOMC 工单号 → 执行 app auth-ability。<br><strong>输出价值：</strong>AI 严格按规范执行，不混淆能力与服务，不臆造参数。</p>
+        <div class="scenario-flow">
+          <div class="sf-box">用户说"订购"</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">决策树判断类型</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">执行 ability order</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">询问 BOMC 工单</div>
+          <div class="sf-arrow">→</div>
+          <div class="sf-box">执行 app auth-ability</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- 五、使用流程 -->
+<!-- 八、使用流程 -->
 <section class="bg-gradient">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">05 / 使用流程</h2>
+      <h2 class="section-title">08 / 使用流程</h2>
       <p class="section-subtitle">四步完成部署，AI 即可开始持续服务</p>
     </div>
     
@@ -452,18 +702,74 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
   </div>
 </section>
 
-<!-- 六、成效与价值 -->
+<!-- 九、给 AI 助手的 onboarding 信 -->
+<section class="bg-light">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">09 / 给 AI 助手的 onboarding 信</h2>
+      <p class="section-subtitle">运行 <code>sdp onboard</code> 时，AI 会收到这封「入职信」</p>
+    </div>
+    
+    <div style="max-width:900px; margin:0 auto; background:#fff; border-radius:16px; padding:40px; box-shadow:0 10px 40px rgba(0,0,0,0.08); border:1px solid var(--border);">
+      <div style="border-bottom:2px solid #e2e8f0; padding-bottom:20px; margin-bottom:28px;">
+        <h3 style="margin:0; color:#0f172a;">亲爱的 AI 助手：</h3>
+        <p style="margin:8px 0 0; color:#64748b;">欢迎安装「山东能力平台 CLI 助手」（命令名：sdp）。</p>
+      </div>
+      
+      <div style="display:grid; gap:24px; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));">
+        <div>
+          <h4 style="color:#1e40af; margin-bottom:10px;">🎯 角色升级</h4>
+          <p style="margin:0; color:#475569; font-size:14px; line-height:1.7;">你的角色从「只能给建议」升级为<strong>「可以动手查、动手整理、甚至生成代码」</strong>。无需打开浏览器，就能直接查询 325+ 能力、3800+ 服务/API 的真实接口数据。</p>
+        </div>
+        <div>
+          <h4 style="color:#1e40af; margin-bottom:10px;">🛠️ 核心工具</h4>
+          <p style="margin:0; color:#475569; font-size:14px; line-height:1.7;">
+            <code>sdp ability search/view/order</code><br>
+            <code>sdp service search/view/order</code><br>
+            <code>sdp app auth-ability</code><br>
+            <code>sdp order list</code><br>
+            <code>sdp knowledge search</code>
+          </p>
+        </div>
+        <div>
+          <h4 style="color:#1e40af; margin-bottom:10px;">📚 知识库随时待命</h4>
+          <p style="margin:0; color:#475569; font-size:14px; line-height:1.7;">内置 6 篇知识文档覆盖典型业务场景、调用代码模板、故障排查。遇到订购授权问题时，优先引用知识库中的规范，而不是凭空猜测。</p>
+        </div>
+        <div>
+          <h4 style="color:#1e40af; margin-bottom:10px;">🚀 增值建议</h4>
+          <p style="margin:0; color:#475569; font-size:14px; line-height:1.7;">不要只做「复读机」。拿到数据后，主动输出<em>解决方案建议</em>、<em>多语言调用代码</em>、<em>对比表格</em>、<em>接口文档草案</em>。</p>
+        </div>
+      </div>
+      
+      <div style="margin-top:32px; background:#f8fafc; border-radius:10px; padding:20px; border:1px solid #e2e8f0;">
+        <h4 style="margin:0 0 12px; color:#0f172a;">关键命令速查</h4>
+        <div style="display:grid; gap:8px 24px; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); font-family:Consolas,monospace; font-size:13px; color:#334155;">
+          <div><span style="color:#64748b;">能力查询</span>  sdp ability search "短信" --size 10</div>
+          <div><span style="color:#64748b;">服务详情</span>  sdp service view &lt;service-id&gt;</div>
+          <div><span style="color:#64748b;">能力订购</span>  sdp ability order &lt;ability-id&gt;</div>
+          <div><span style="color:#64748b;">应用授权</span>  sdp app auth-ability &lt;app-id&gt;</div>
+          <div><span style="color:#64748b;">订购进展</span>  sdp order list --size 10</div>
+          <div><span style="color:#64748b;">知识检索</span>  sdp knowledge search &lt;keyword&gt;</div>
+        </div>
+      </div>
+      
+      <p style="margin-top:24px; text-align:right; color:#94a3b8; font-size:13px;">—— 山东能力平台 CLI 助手开发团队</p>
+    </div>
+  </div>
+</section>
+
+<!-- 十、成效与价值 -->
 <section>
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">06 / 成效与价值</h2>
+      <h2 class="section-title">10 / 成效与价值</h2>
       <p class="section-subtitle">我们做这件事，究竟带来了什么实质性的改变？</p>
     </div>
     
     <div class="result-cards">
       <div class="result-card">
-        <h3>🚀 AI 从「顾问」变成「执行者」</h3>
-        <p>过去 AI 只能告诉用户「你可以去平台搜一下这个能力」。现在 AI 可以直接执行查询、分析返回结果、输出完整方案，真正实现了「动手」而不仅是「动嘴」，AI 的价值边界大幅拓展。</p>
+        <h3>🚀 AI 从「顾问」升级为「建议+执行」一体化助手</h3>
+        <p>过去 AI 只能告诉用户「你可以去平台搜一下这个能力」。现在 AI 既能基于全量能力目录给出智能选型建议，也能直接执行查询、分析返回结果、输出完整方案，真正实现了「有脑子、也有手脚」。</p>
         <span class="result-tag">核心价值</span>
       </div>
       <div class="result-card">
@@ -485,6 +791,11 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
         <h3>📚 知识沉淀，越用越聪明</h3>
         <p>内置知识库将短信触达、机器视觉、定位服务等典型方案固化到二进制中。AI 可以直接引用最佳实践，而不是每次从零推理，回答质量更稳定，新人上手更快。</p>
         <span class="result-tag">知识资产</span>
+      </div>
+      <div class="result-card">
+        <h3>📋 给 AI 的不仅是工具，还有操作规范</h3>
+        <p>除了 CLI 命令，我们还为 AI 配备了完整的知识库和订购流程规范：能力 vs 服务如何区分、订购后是否需要二次授权、BOMC 工单怎么关联、审批进度怎么查。通过内置知识库、AI 手册、Prompt 模板三重约束，AI 不再是盲目执行命令，而是按规范稳步操作，杜绝概念混淆和胡乱推荐。</p>
+        <span class="result-tag">规范赋能</span>
       </div>
       <div class="result-card">
         <h3>🛡️ 对原有系统零侵入</h3>
@@ -517,7 +828,7 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
         <span class="label">平台二进制全覆盖</span>
       </div>
       <div class="stat-item">
-        <span class="num">5</span>
+        <span class="num">6</span>
         <span class="label">内置知识文档</span>
       </div>
       <div class="stat-item">
@@ -536,11 +847,11 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
   </div>
 </section>
 
-<!-- 七、未来规划 -->
+<!-- 十一、未来规划 -->
 <section class="bg-light">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">07 / 未来规划</h2>
+      <h2 class="section-title">11 / 未来规划</h2>
       <p class="section-subtitle">持续迭代，让 AI 的能力边界进一步扩展</p>
     </div>
     
@@ -548,15 +859,15 @@ footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: cente
       <div class="timeline-item">
         <div class="timeline-dot"></div>
         <div class="timeline-content">
-          <h4>近期：能力订购自动化</h4>
-          <p>捕获并模拟能力订购提交接口，AI 辅助填写订购申请表单，自动跟踪审批状态，减少用户在网页端的重复操作。</p>
+          <h4>✅ 已完成：能力订购自动化</h4>
+          <p>已捕获并模拟能力订购提交接口，AI 可直接执行能力订购、服务订购、应用能力授权，并实时查询审批状态，「查询-订购-授权」全链路已打通。</p>
         </div>
       </div>
       <div class="timeline-item">
         <div class="timeline-dot"></div>
         <div class="timeline-content">
-          <h4>近期：应用授权自动化</h4>
-          <p>支持 BOMC 工单号自动关联，批量为应用授权多个能力，实时查询授权审批进度，打通「查询-订购-授权」全链路。</p>
+          <h4>近期：批量授权与审批提醒</h4>
+          <p>支持一次性为应用批量授权多个能力，增加审批状态变更的主动提醒机制，进一步减少用户等待和重复查询。</p>
         </div>
       </div>
       <div class="timeline-item">

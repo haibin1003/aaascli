@@ -9,7 +9,14 @@ import (
 )
 
 var (
-	serviceKeyword string
+	serviceKeyword    string
+	serviceAppID      string
+	serviceAppName    string
+	serviceBomcID     string
+	svcQuotaLimit     string
+	svcLimitCount     string
+	svcPolicyPeriod   string
+	svcPolicyTimeUnit string
 )
 
 var serviceCmd = &cobra.Command{
@@ -45,17 +52,35 @@ var serviceViewCmd = &cobra.Command{
 	},
 }
 
+var serviceOrderCmd = &cobra.Command{
+	Use:   "order [service-id]",
+	Short: "订购服务（含应用授权）",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		orderService(args[0])
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(serviceCmd)
 	serviceCmd.AddCommand(serviceListCmd)
 	serviceCmd.AddCommand(serviceSearchCmd)
 	serviceCmd.AddCommand(serviceViewCmd)
+	serviceCmd.AddCommand(serviceOrderCmd)
 
 	serviceListCmd.Flags().IntVar(&abilityPage, "page", 1, "页码")
 	serviceListCmd.Flags().IntVarP(&abilitySize, "size", "s", 20, "每页条数")
 
 	serviceSearchCmd.Flags().IntVar(&abilityPage, "page", 1, "页码")
 	serviceSearchCmd.Flags().IntVarP(&abilitySize, "size", "s", 20, "每页条数")
+
+	serviceOrderCmd.Flags().StringVar(&serviceAppID, "app-id", "", "授权应用ID")
+	serviceOrderCmd.Flags().StringVar(&serviceAppName, "app-name", "", "应用名称（不提供则自动查询）")
+	serviceOrderCmd.Flags().StringVar(&serviceBomcID, "bomc", "", "BOMC 工单编码")
+	serviceOrderCmd.Flags().StringVar(&svcQuotaLimit, "quota-limit", "100", "流控配额限制")
+	serviceOrderCmd.Flags().StringVar(&svcLimitCount, "limit-count", "100", "流控次数限制")
+	serviceOrderCmd.Flags().StringVar(&svcPolicyPeriod, "policy-period", "1", "流控周期")
+	serviceOrderCmd.Flags().StringVar(&svcPolicyTimeUnit, "policy-time-unit", "second", "流控周期单位")
 }
 
 func listServices() {
@@ -119,6 +144,83 @@ func viewService(serviceID string) {
 			return nil, fmt.Errorf("查询服务详情失败: %w", err)
 		}
 		return formatServiceDetail(detail), nil
+	}, common.ExecuteOptions{
+		DebugMode:   debugMode,
+		Insecure:    insecure,
+		DryRun:      dryRun,
+		Cookie:      cookieFlag,
+		PrettyPrint: prettyPrint,
+	})
+}
+
+func orderService(serviceID string) {
+	common.Execute(func(ctx *common.CommandContext) (interface{}, error) {
+		if err := ctx.CheckLoggedIn(); err != nil {
+			return nil, err
+		}
+		if serviceAppID == "" {
+			return nil, fmt.Errorf("请使用 --app-id 指定要授权的应用 ID")
+		}
+
+		// 获取服务详情
+		svc := api.NewServiceService(ctx.Client)
+		detail, err := svc.GetDetail(serviceID)
+		if err != nil {
+			return nil, fmt.Errorf("获取服务详情失败: %w", err)
+		}
+
+		// 获取应用名称
+		appName := serviceAppName
+		if appName == "" {
+			appSvc := api.NewAppService(ctx.Client)
+			apps, err := appSvc.ListMyApps(1, 100, "")
+			if err != nil {
+				return nil, fmt.Errorf("查询应用列表失败: %w", err)
+			}
+			for _, app := range apps {
+				if app.AppID == serviceAppID {
+					appName = app.AppName
+					break
+				}
+			}
+			if appName == "" {
+				return nil, fmt.Errorf("未找到应用 ID: %s", serviceAppID)
+			}
+		}
+
+		// domainId 从服务详情推断，若无法识别则默认 B
+		domainID := "B"
+		if detail.DomainName != "" {
+			// 简单取首个字符，如 "B域" -> "B"
+			domainID = string([]rune(detail.DomainName)[0])
+		}
+
+		resp, err := svc.OrderService(&api.OrderServiceRequest{
+			ServiceID:      serviceID,
+			AppID:          serviceAppID,
+			AppName:        appName,
+			APIName:        detail.Name,
+			DomainID:       domainID,
+			MaxVersion:     detail.APIVersion,
+			AuthType:       "api",
+			InterfaceID:    detail.InterfaceID,
+			BomcID:         serviceBomcID,
+			QuotaLimit:     svcQuotaLimit,
+			LimitCount:     svcLimitCount,
+			PolicyPeriod:   svcPolicyPeriod,
+			PolicyTimeUnit: svcPolicyTimeUnit,
+			GoodsNames:     detail.Name,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("订购失败: %w", err)
+		}
+		return map[string]interface{}{
+			"message":   "服务订购请求已提交",
+			"serviceId": serviceID,
+			"appId":     serviceAppID,
+			"appName":   appName,
+			"orderId":   resp.Data.OrderID,
+		}, nil
 	}, common.ExecuteOptions{
 		DebugMode:   debugMode,
 		Insecure:    insecure,

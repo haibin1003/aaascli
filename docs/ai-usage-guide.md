@@ -13,8 +13,11 @@
 - 查看能力/服务详情
 - 浏览能力下的服务菜单
 - 查询用户的应用列表
+- **订购能力 / 订购服务**
+- **为应用授权能力**
+- **查询订购申请进展**
 
-**注意**：涉及订购、授权等写操作目前需要用户手动在浏览器完成。
+**注意**：涉及订购、授权等写操作现在可以直接通过 CLI 完成，但 BOMC 工单号必须由用户提供。
 
 ---
 
@@ -139,6 +142,10 @@ sdp ability list --size 3
 | 命令 | 作用 |
 |------|------|
 | `sdp app list --size 10` | 查询用户已创建的应用列表 |
+| `sdp ability order <ability-id>` | 提交能力订购申请 |
+| `sdp app auth-ability <app-id> --ability <id> --bomc <ticket>` | 为应用授权能力 |
+| `sdp service order <service-id> --app-id <id> --bomc <ticket>` | 订购服务（一步完成授权） |
+| `sdp order list --size 10` | 查询我的订购/授权申请记录 |
 
 ### 4.4 辅助命令
 
@@ -255,7 +262,7 @@ sdp service view SE202604081915467601182242
 sdp app list --size 10
 ```
 
-说明：返回用户已创建的应用列表，用于后续授权等操作（目前授权功能需浏览器端完成）。
+说明：返回用户已创建的应用列表，用于后续订购、授权等操作。
 
 ---
 
@@ -292,10 +299,37 @@ sdp ability search "大数据短信" --size 5
 
 # 2. 查看详情确认
 sdp ability view CA202507031538155471116699106450
+
+# 3. 提交能力订购
+sdp ability order CA202507031538155471116699106450
+
+# 4. 为应用授权该能力（需用户提供 app-id 和 BOMC 工单号）
+sdp app auth-ability <app-id> \
+  --ability CA202507031538155471116699106450 \
+  --bomc <bomc-ticket>
 ```
 
-然后告知用户：
-> 「该能力的订购需要您在网页端手动完成。请访问 https://service.sd.10086.cn/aaas/，找到该能力后点击订购按钮，按流程提交申请。」
+### 场景 D：用户想订购服务
+
+```bash
+# 1. 搜索确认服务 ID
+sdp service search "营业厅信息查询" --size 5
+
+# 2. 查看服务详情
+sdp service view SE202604100446026231000121
+
+# 3. 订购并授权给应用（一步完成，需用户提供 app-id 和 BOMC 工单号）
+sdp service order SE202604100446026231000121 \
+  --app-id <app-id> \
+  --bomc <bomc-ticket>
+```
+
+### 场景 E：查询订购/授权进展
+
+```bash
+# 查询申请记录
+sdp order list --size 10 --pass-status true
+```
 
 ---
 
@@ -311,6 +345,7 @@ sdp ability view CA202507031538155471116699106450
 - `ability services` 返回空：说明该能力下确实没有挂载服务，或用户尚未订购
 - `app list` 返回空：说明该账号没有创建过应用
 - `service search` 返回空：关键词未匹配到任何服务，尝试换关键词
+- `order list` 返回空：可能是平台查询条件限制，或当前确实没有申请记录
 
 ### 7.3 中文显示乱码（Windows）
 
@@ -428,4 +463,4 @@ if __name__ == "__main__":
 ---
 
 **版本**：dev  
-**最后更新**：2026-04-14
+**最后更新**：2026-04-15

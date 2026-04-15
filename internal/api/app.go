@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -112,4 +113,78 @@ func (s *AppService) ListMyApps(page, size int, appName string) ([]MyApp, error)
 	}
 
 	return result.Data.AppList.List, nil
+}
+
+// AuthAbilityRequest 应用授权能力请求
+type AuthAbilityRequest struct {
+	AppID          string `json:"appId"`
+	AbilityID      string `json:"-"`
+	AppName        string `json:"appName"`
+	AuthType       string `json:"authType"`        // 固定 "capacity"
+	Status         string `json:"status"`          // 固定 "AppStatusOnline"
+	BomcID         string `json:"bomcId"`
+	QuotaLimit     string `json:"-"`
+	LimitCount     string `json:"-"`
+	PolicyPeriod   string `json:"-"`
+	PolicyTimeUnit string `json:"-"`
+	GoodsNames     string `json:"goodsNames"`
+}
+
+// AuthAbilityResponse 授权响应
+type AuthAbilityResponse struct {
+	Status string `json:"status"`
+	Code   string `json:"code"`
+	Msg    string `json:"msg"`
+	Data   struct {
+		OrderID string `json:"orderId"`
+	} `json:"data"`
+}
+
+// AuthAbility 为应用授权能力
+func (s *AppService) AuthAbility(req *AuthAbilityRequest) (*AuthAbilityResponse, error) {
+	body := appAuthAbilityPayload{
+		AppID:              req.AppID,
+		OrderedGoodList:    []string{},
+		NewOrderedGoodList: []string{req.AbilityID},
+		CrmOrderList:       []string{},
+		Status:             req.Status,
+		AuthType:           req.AuthType,
+		BomcID:             req.BomcID,
+		LimitAndQuotaData: []limitAndQuotaItem{
+			{
+				ID:             req.AbilityID,
+				Name:           req.GoodsNames,
+				AppID:          req.AppID,
+				AppName:        req.AppName,
+				Type:           "capacity",
+				QuotaLimit:     req.QuotaLimit,
+				LimitCount:     req.LimitCount,
+				PolicyPeriod:   req.PolicyPeriod,
+				PolicyTimeUnit: req.PolicyTimeUnit,
+			},
+		},
+		AppNames:   req.AppName,
+		GoodsNames: req.GoodsNames,
+	}
+
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		return nil, fmt.Errorf("marshal request failed: %w", err)
+	}
+
+	resp, err := s.client.PostMultipart("/openportalsrv/rest/portaluser/appManager/doAppOeder", "application/json", jsonBytes)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	var result AuthAbilityResponse
+	if err := ParseJSON(resp, &result); err != nil {
+		return nil, fmt.Errorf("parse response failed: %w", err)
+	}
+
+	if result.Code != "00000" {
+		return nil, fmt.Errorf("API error [%s]: %s", result.Code, result.Msg)
+	}
+
+	return &result, nil
 }

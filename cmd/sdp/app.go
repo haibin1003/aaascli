@@ -9,11 +9,15 @@ import (
 )
 
 var (
-	appPage    int
-	appSize    int
-	appName    string
-	abilityID  string
-	bomcID     string
+	appPage          int
+	appSize          int
+	appName          string
+	abilityID        string
+	bomcID           string
+	quotaLimit       string
+	limitCount       string
+	policyPeriod     string
+	policyTimeUnit   string
 )
 
 var appCmd = &cobra.Command{
@@ -39,18 +43,16 @@ var appAuthListCmd = &cobra.Command{
 }
 
 var appAuthAbilityCmd = &cobra.Command{
-	Use:   "auth-ability [app-name]",
-	Short: "为应用授权能力（暂未实现）",
+	Use:   "auth-ability [app-id]",
+	Short: "为应用授权能力",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		common.Execute(func(ctx *common.CommandContext) (interface{}, error) {
-			return nil, fmt.Errorf("授权能力接口尚未实现，请在浏览器中手动完成")
-		}, common.ExecuteOptions{PrettyPrint: prettyPrint})
+		authAbilityForApp(args[0])
 	},
 }
 
 var appAuthStatusCmd = &cobra.Command{
-	Use:   "auth-status [app-name]",
+	Use:   "auth-status [app-id]",
 	Short: "查看授权审批状态（暂未实现）",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -73,6 +75,80 @@ func init() {
 
 	appAuthAbilityCmd.Flags().StringVarP(&abilityID, "ability", "a", "", "能力 ID")
 	appAuthAbilityCmd.Flags().StringVarP(&bomcID, "bomc", "b", "", "BOMC 工单编码")
+	appAuthAbilityCmd.Flags().StringVar(&quotaLimit, "quota-limit", "500", "流控配额限制")
+	appAuthAbilityCmd.Flags().StringVar(&limitCount, "limit-count", "500", "流控次数限制")
+	appAuthAbilityCmd.Flags().StringVar(&policyPeriod, "policy-period", "1", "流控周期")
+	appAuthAbilityCmd.Flags().StringVar(&policyTimeUnit, "policy-time-unit", "second", "流控周期单位")
+}
+
+func authAbilityForApp(appID string) {
+	common.Execute(func(ctx *common.CommandContext) (interface{}, error) {
+		if err := ctx.CheckLoggedIn(); err != nil {
+			return nil, err
+		}
+		if abilityID == "" {
+			return nil, fmt.Errorf("请使用 --ability 指定要授权的能力 ID")
+		}
+		if bomcID == "" {
+			return nil, fmt.Errorf("请使用 --bomc 指定 BOMC 工单编码")
+		}
+
+		// 获取应用名称
+		appSvc := api.NewAppService(ctx.Client)
+		apps, err := appSvc.ListMyApps(1, 100, "")
+		if err != nil {
+			return nil, fmt.Errorf("查询应用列表失败: %w", err)
+		}
+		var appNameFound string
+		for _, app := range apps {
+			if app.AppID == appID {
+				appNameFound = app.AppName
+				break
+			}
+		}
+		if appNameFound == "" {
+			return nil, fmt.Errorf("未找到应用 ID: %s", appID)
+		}
+
+		// 获取能力名称
+		abilitySvc := api.NewAbilityService(ctx.Client)
+		detail, err := abilitySvc.GetDetail(abilityID)
+		if err != nil {
+			return nil, fmt.Errorf("获取能力详情失败: %w", err)
+		}
+
+		resp, err := appSvc.AuthAbility(&api.AuthAbilityRequest{
+			AppID:          appID,
+			AbilityID:      abilityID,
+			AppName:        appNameFound,
+			AuthType:       "capacity",
+			Status:         "AppStatusOnline",
+			BomcID:         bomcID,
+			QuotaLimit:     quotaLimit,
+			LimitCount:     limitCount,
+			PolicyPeriod:   policyPeriod,
+			PolicyTimeUnit: policyTimeUnit,
+			GoodsNames:     detail.Name,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("授权失败: %w", err)
+		}
+		return map[string]interface{}{
+			"message":     "授权请求已提交",
+			"appId":       appID,
+			"appName":     appNameFound,
+			"abilityId":   abilityID,
+			"abilityName": detail.Name,
+			"bomcId":      bomcID,
+			"orderId":     resp.Data.OrderID,
+		}, nil
+	}, common.ExecuteOptions{
+		DebugMode:   debugMode,
+		Insecure:    insecure,
+		DryRun:      dryRun,
+		Cookie:      cookieFlag,
+		PrettyPrint: prettyPrint,
+	})
 }
 
 func listMyApps() {

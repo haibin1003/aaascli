@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -246,7 +247,58 @@ func (s *AbilityService) ListServices(abilityID string) ([]AbilityServiceItem, e
 	return result.Data.ServiceMenus, nil
 }
 
+// OrderRequest 能力订购请求
+type OrderRequest struct {
+	AbilityID   string `json:"abilityId"`
+	AppID       string `json:"appId"`
+	Period      string `json:"period"`      // 订购周期，如 1个月/3个月/1年
+	Remark      string `json:"remark"`      // 申请说明
+	ContactName string `json:"contactName"`
+	ContactTel  string `json:"contactTel"`
+}
+
+// OrderResponse 订购响应
+type OrderResponse struct {
+	Status string `json:"status"`
+	Code   string `json:"code"`
+	Msg    string `json:"msg"`
+	Data   struct {
+		OrderID string `json:"orderId"`
+	} `json:"data"`
+}
+
 // OrderAbility 订购能力
-func (s *AbilityService) OrderAbility(abilityID string) error {
-	return fmt.Errorf("订购接口尚未实现，请在浏览器中手动完成订购")
+func (s *AbilityService) OrderAbility(req *OrderRequest) (*OrderResponse, error) {
+	// 先获取能力名称
+	detail, err := s.GetDetail(req.AbilityID)
+	if err != nil {
+		return nil, fmt.Errorf("获取能力详情失败: %w", err)
+	}
+
+	body := abilityOrderPayload{
+		CapacityID:   req.AbilityID,
+		OrderType:    "CAPACITY",
+		CapacityName: detail.Name,
+	}
+
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		return nil, fmt.Errorf("marshal request failed: %w", err)
+	}
+
+	resp, err := s.client.PostMultipart("/openportalsrv/rest/portaluser/capacityOrder/orderCapacity?isCloseLoginDialog=true", "application/json", jsonBytes)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	var result OrderResponse
+	if err := ParseJSON(resp, &result); err != nil {
+		return nil, fmt.Errorf("parse response failed: %w", err)
+	}
+
+	if result.Code != "00000" {
+		return nil, fmt.Errorf("API error [%s]: %s", result.Code, result.Msg)
+	}
+
+	return &result, nil
 }

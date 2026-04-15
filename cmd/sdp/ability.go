@@ -9,9 +9,14 @@ import (
 )
 
 var (
-	abilityPage    int
-	abilitySize    int
-	abilityKeyword string
+	abilityPage        int
+	abilitySize        int
+	abilityKeyword     string
+	orderAppID         string
+	orderPeriod        string
+	orderRemark        string
+	orderContactName   string
+	orderContactTel    string
 )
 
 var abilityCmd = &cobra.Command{
@@ -93,6 +98,12 @@ func init() {
 
 	abilityMyCmd.Flags().IntVar(&abilityPage, "page", 1, "页码")
 	abilityMyCmd.Flags().IntVarP(&abilitySize, "size", "s", 20, "每页条数")
+
+	abilityOrderCmd.Flags().StringVar(&orderAppID, "app-id", "", "授权应用ID（订购后绑定到该应用）")
+	abilityOrderCmd.Flags().StringVar(&orderPeriod, "period", "1年", "订购周期")
+	abilityOrderCmd.Flags().StringVar(&orderRemark, "remark", "", "订购说明/申请理由")
+	abilityOrderCmd.Flags().StringVar(&orderContactName, "contact-name", "", "联系人姓名")
+	abilityOrderCmd.Flags().StringVar(&orderContactTel, "contact-tel", "", "联系人电话")
 }
 
 func listAbilities() {
@@ -161,13 +172,22 @@ func orderAbility(abilityID string) {
 			return nil, err
 		}
 		service := api.NewAbilityService(ctx.Client)
-		if err := service.OrderAbility(abilityID); err != nil {
+		req := &api.OrderRequest{
+			AbilityID:   abilityID,
+			AppID:       orderAppID,
+			Period:      orderPeriod,
+			Remark:      orderRemark,
+			ContactName: orderContactName,
+			ContactTel:  orderContactTel,
+		}
+		resp, err := service.OrderAbility(req)
+		if err != nil {
 			return nil, fmt.Errorf("订购失败: %w", err)
 		}
 		return map[string]interface{}{
-			"message":   "订购请求已处理（如适用）",
+			"message":   "订购请求已提交",
 			"abilityId": abilityID,
-			"note":      "部分能力需要在网页端完成订购流程",
+			"orderId":   resp.Data.OrderID,
 		}, nil
 	}, common.ExecuteOptions{
 		DebugMode:   debugMode,

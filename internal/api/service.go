@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -118,4 +119,84 @@ func (s *ServiceService) GetDetail(serviceID string) (*ServiceDetail, error) {
 	}
 
 	return &result.Data.ServiceInfo, nil
+}
+
+// OrderServiceRequest 服务订购请求
+type OrderServiceRequest struct {
+	ServiceID      string `json:"serviceId"` // 实际对应 body 中的 appId
+	AppID          string `json:"-"`         // 实际对应 newOrderedAppList
+	AppName        string `json:"appName"`
+	APIName        string `json:"apiName"`
+	DomainID       string `json:"domainId"`
+	MaxVersion     string `json:"maxVersion"`
+	AuthType       string `json:"authType"` // 固定 "api"
+	InterfaceID    string `json:"interfaceId"`
+	BomcID         string `json:"bomcId"`
+	QuotaLimit     string `json:"-"`
+	LimitCount     string `json:"-"`
+	PolicyPeriod   string `json:"-"`
+	PolicyTimeUnit string `json:"-"`
+	GoodsNames     string `json:"goodsNames"`
+}
+
+// OrderServiceResponse 服务订购响应
+type OrderServiceResponse struct {
+	Status string `json:"status"`
+	Code   string `json:"code"`
+	Msg    string `json:"msg"`
+	Data   struct {
+		OrderID string `json:"orderId"`
+	} `json:"data"`
+}
+
+// OrderService 订购服务
+func (s *ServiceService) OrderService(req *OrderServiceRequest) (*OrderServiceResponse, error) {
+	body := serviceOrderPayload{
+		AppID:             req.ServiceID,
+		OrderedAppList:    []string{},
+		NewOrderedAppList: []string{req.AppID},
+		APIName:           req.APIName,
+		DomainID:          req.DomainID,
+		MaxVersion:        req.MaxVersion,
+		AuthType:          req.AuthType,
+		InterfaceID:       req.InterfaceID,
+		AppName:           req.AppName,
+		BomcID:            req.BomcID,
+		LimitAndQuotaData: []limitAndQuotaItem{
+			{
+				ID:             req.ServiceID,
+				Name:           req.GoodsNames,
+				AppID:          req.AppID,
+				AppName:        req.AppName,
+				Type:           "api",
+				QuotaLimit:     req.QuotaLimit,
+				LimitCount:     req.LimitCount,
+				PolicyPeriod:   req.PolicyPeriod,
+				PolicyTimeUnit: req.PolicyTimeUnit,
+			},
+		},
+		AppNames:   req.AppName,
+		GoodsNames: req.GoodsNames,
+	}
+
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		return nil, fmt.Errorf("marshal request failed: %w", err)
+	}
+
+	resp, err := s.client.PostMultipart("/openportalsrv/rest/portaluser/myOrder/doAppOrder", "application/json", jsonBytes)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	var result OrderServiceResponse
+	if err := ParseJSON(resp, &result); err != nil {
+		return nil, fmt.Errorf("parse response failed: %w", err)
+	}
+
+	if result.Code != "00000" {
+		return nil, fmt.Errorf("API error [%s]: %s", result.Code, result.Msg)
+	}
+
+	return &result, nil
 }

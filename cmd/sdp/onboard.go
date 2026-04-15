@@ -61,16 +61,23 @@ func printOnboardGuide() {
   sdp ability search <keyword>          按关键词搜索能力
   sdp ability view <ability-id>         查看能力详情（描述、提供方、分类等）
   sdp ability services <ability-id>     查看能力下挂载的服务菜单
-  sdp ability order <ability-id>        订购能力（未实现，需用户手动在网页完成）
+  sdp ability order <ability-id>        提交能力订购申请
   sdp ability my                        查看我的已订购能力
 
 【数字服务管理】
   sdp service list                      查询全量服务目录（目录+API 混合树）
   sdp service search <keyword>          搜索具体 API 服务
   sdp service view <service-id>         查看服务详情（URL、示例、负责人等）
+  sdp service order <service-id>        订购服务（一步完成订购+授权）
 
 【应用管理】
   sdp app list                          查看用户已创建的应用列表
+  sdp app auth-ability <app-id>         为应用授权能力（支持 BOMC 工单关联）
+
+【订购申请查询】
+  sdp order list                        查询我的订购/授权申请及审批状态
+
+【认证与辅助】
 
 【认证与辅助】
   sdp login <token>                     设置登录凭证
@@ -98,6 +105,14 @@ func printOnboardGuide() {
 
 场景 4：用户做技术预研，需要能力对比分析
     → 你提取多个能力的描述、提供方、适用场景，输出对比报告。
+
+场景 5：用户想订购能力并授权给应用
+    → 你执行 sdp ability order 提交订购，然后执行 sdp app auth-ability
+       完成授权（需用户提供 app-id 和 BOMC 工单号）。
+
+场景 6：用户想订购具体 API 服务
+    → 你执行 sdp service order（一步完成订购+授权），需提供 app-id 和
+       BOMC 工单号。
 
 四、安装与登录流程（需要你与用户配合）
 --------------------------------------------------------------------------------
@@ -164,7 +179,10 @@ func printOnboardGuide() {
   sdp service list --size 20               查询全量服务目录
   sdp service search <keyword> --size 10   搜索 API 服务
   sdp service view <service-id>            查看服务详情
+  sdp service order <service-id>           订购服务（一步授权）
   sdp app list --size 10                   查看我的应用
+  sdp app auth-ability <app-id>            为应用授权能力
+  sdp order list --size 10                 查询订购/授权进展
   sdp knowledge list                       查看知识文档
   sdp knowledge search <keyword>           搜索知识库
   sdp login <token>                        登录
@@ -199,7 +217,7 @@ func printOnboardGuide() {
     → ~/.sdp/config.json 不存在或已过期，让用户重新点击插件复制 login 命令。
 
   ability services 返回空数组
-    → 该能力下确实没有挂载服务，或用户尚未在网页端订购该能力。
+    → 该能力下确实没有挂载服务，或用户尚未订购该能力。
 
   app list 返回空数组
     → 该账号尚未创建任何应用。
