@@ -29,6 +29,7 @@ type Client struct {
 	VerificationCode string
 	ServiceID        string
 	Crypto           *CryptoContext
+	BaseURL          string
 }
 
 // NewClient 创建新客户端
@@ -61,6 +62,7 @@ func NewClientWithExtra(cookie, verificationCode, serviceID string, insecure boo
 		VerificationCode: verificationCode,
 		ServiceID:        serviceID,
 		Crypto:           &CryptoContext{},
+		BaseURL:          BaseURL,
 	}
 }
 
@@ -112,7 +114,7 @@ func (c *Client) GetFullCookie() string {
 
 // Request 发送 HTTP 请求
 func (c *Client) Request(method, path string, body interface{}) (*http.Response, error) {
-	url := BaseURL + path
+	url := c.BaseURL + path
 
 	var bodyReader io.Reader
 	if body != nil {
@@ -174,7 +176,7 @@ func (c *Client) Post(path string, body interface{}) (*http.Response, error) {
 
 // PostMultipart 发送 multipart/form-data POST 请求
 func (c *Client) PostMultipart(path string, contentType string, body []byte) (*http.Response, error) {
-	url := BaseURL + path
+	url := c.BaseURL + path
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("create request failed: %w", err)
