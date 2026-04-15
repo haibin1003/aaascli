@@ -13,6 +13,4 @@ require (
 	golang.org/x/text v0.21.0
 )
 
-
 replace golang.org/x/text => ./third_party/golang.org/x/text
-
