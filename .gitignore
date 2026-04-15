@@ -1,0 +1,24 @@
+# Binaries
+*.exe
+sdp
+!sdp-login-helper/
+
+# Build outputs
+/release/bin/*
+/release/sdp-package.zip
+/release/sdp-package/
+
+# Local config
+/.sdp/
+~/.sdp/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db

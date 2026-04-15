@@ -52,16 +52,16 @@
 
 ### 方式一：预编译二进制（发给 AI 时推荐）
 
-从 `release/bin/` 目录选择对应平台的二进制文件：
+访问 [GitHub Releases](https://github.com/haibin1003/aaascli/releases) 下载最新版本的安装包或对应平台的二进制文件：
 
 | 平台 | 文件 |
 |------|------|
-| Windows x64 | `release/bin/sdp-windows-x64.exe` |
-| Windows ARM64 | `release/bin/sdp-windows-arm64.exe` |
-| Linux x64 | `release/bin/sdp-linux-x64` |
-| Linux ARM64 | `release/bin/sdp-linux-arm64` |
-| macOS Intel | `release/bin/sdp-darwin-x64` |
-| macOS Apple Silicon | `release/bin/sdp-darwin-arm64` |
+| Windows x64 | `sdp-windows-x64.exe` |
+| Windows ARM64 | `sdp-windows-arm64.exe` |
+| Linux x64 | `sdp-linux-x64` |
+| Linux ARM64 | `sdp-linux-arm64` |
+| macOS Intel | `sdp-darwin-x64` |
+| macOS Apple Silicon | `sdp-darwin-arm64` |
 
 将文件重命名为 `sdp`（Windows 为 `sdp.exe`），加入系统 PATH 即可。
 
