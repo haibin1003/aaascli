@@ -29,7 +29,7 @@
 | # | 任务 | 依赖 | 预估工时 | 状态 |
 |---|------|------|----------|------|
 | 1.1 | 为 `internal/api/client.go` 写 Mock 测试，验证 HTTP 请求构建和响应解析 | - | 4h | ✅ 已完成 |
-| 1.2 | 为 `internal/api/ability.go` 写单元测试（ListAll / Search / View / Services / My / Order） | 1.1 | 6h | ⬜ 待办 |
+| 1.2 | 为 `internal/api/ability.go` 写单元测试（ListAll / Search / View / Services / My / Order） | 1.1 | 6h | ✅ 已完成 |
 | 1.3 | 为 `internal/api/service.go` 写单元测试（ListAll / Search / View / Order） | 1.1 | 5h | ⬜ 待办 |
 | 1.4 | 为 `internal/api/app.go` 写单元测试（List / AuthAbility） | 1.1 | 4h | ⬜ 待办 |
 | 1.5 | 为 `internal/api/order.go` 写单元测试（ListMyApplies） | 1.1 | 3h | ⬜ 待办 |
@@ -62,7 +62,8 @@
 | - | 保存 Session 快照 | 2026-04-15 | `c9c3725` | `SESSION.md` |
 | - | 建立研发规范与项目路线图 | 2026-04-15 | `8aac4dc` | ROADMAP / WORKFLOW / CODING-STANDARDS / TODO |
 | - | 建立 AI 助手工作指南 | 2026-04-15 | `5039b13` | `AGENTS.md` + 文档索引 |
-| - | client.go Mock 测试 + Client.BaseURL 可注入重构 | 2026-04-15 | 当前提交 | `client_test.go` (10 cases) |
+| - | client.go Mock 测试 + Client.BaseURL 可注入重构 | 2026-04-15 | `f6e7ad7` | `client_test.go` (10 cases) |
+| - | ability.go 单元测试全覆盖 | 2026-04-15 | 当前提交 | `ability_test.go` (7 funcs, 18 cases) |
 
 ---
 
