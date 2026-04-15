@@ -31,7 +31,7 @@
 | 1.1 | 为 `internal/api/client.go` 写 Mock 测试，验证 HTTP 请求构建和响应解析 | - | 4h | ✅ 已完成 |
 | 1.2 | 为 `internal/api/ability.go` 写单元测试（ListAll / Search / View / Services / My / Order） | 1.1 | 6h | ✅ 已完成 |
 | 1.3 | 为 `internal/api/service.go` 写单元测试（ListAll / GetDetail / OrderService） | 1.1 | 5h | ✅ 已完成 |
-| 1.4 | 为 `internal/api/app.go` 写单元测试（List / AuthAbility） | 1.1 | 4h | ⬜ 待办 |
+| 1.4 | 为 `internal/api/app.go` 写单元测试（List / ListMyApps / AuthAbility） | 1.1 | 4h | ✅ 已完成 |
 | 1.5 | 为 `internal/api/order.go` 写单元测试（ListMyApplies） | 1.1 | 3h | ⬜ 待办 |
 | 1.6 | 为 `cmd/sdp` 核心命令写集成测试（至少覆盖 ability list/search、service list/search） | 1.2-1.5 | 4h | ⬜ 待办 |
 | 2.1 | 修复知识库 embed 路径：验证 `internal/knowledge/` 与 `docs/knowledge/` 是否同步 | - | 2h | ⬜ 待办 |
@@ -64,7 +64,8 @@
 | - | 建立 AI 助手工作指南 | 2026-04-15 | `5039b13` | `AGENTS.md` + 文档索引 |
 | - | client.go Mock 测试 + Client.BaseURL 可注入重构 | 2026-04-15 | `f6e7ad7` | `client_test.go` (10 cases) |
 | - | ability.go 单元测试全覆盖 | 2026-04-15 | `f122699` | `ability_test.go` (7 funcs, 18 cases) |
-| - | service.go 单元测试全覆盖 | 2026-04-15 | 当前提交 | `service_test.go` (3 funcs, 7 cases) |
+| - | service.go 单元测试全覆盖 | 2026-04-15 | `20b63f2` | `service_test.go` (3 funcs, 7 cases) |
+| - | app.go 单元测试全覆盖 | 2026-04-15 | 当前提交 | `app_test.go` (3 funcs, 7 cases) |
 
 ---
 
