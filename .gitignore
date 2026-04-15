@@ -1,6 +1,6 @@
 # Binaries
 *.exe
-sdp
+/sdp
 !sdp-login-helper/
 
 # Build outputs
