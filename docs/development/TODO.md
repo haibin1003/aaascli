@@ -34,8 +34,8 @@
 | 1.4 | 为 `internal/api/app.go` 写单元测试（List / ListMyApps / AuthAbility） | 1.1 | 4h | ✅ 已完成 |
 | 1.5 | 为 `internal/api/order.go` 写单元测试（ListMyApplies） | 1.1 | 3h | ✅ 已完成 |
 | 1.6 | 为 `cmd/sdp` 核心命令写集成测试（formatter / flatten / search 逻辑） | 1.2-1.5 | 4h | ✅ 已完成 |
-| 2.1 | 修复知识库 embed 路径：验证 `internal/knowledge/` 与 `docs/knowledge/` 是否同步 | - | 2h | ⬜ 待办 |
-| 2.2 | 若不同步，建立构建时同步机制或修正 embed 路径 | 2.1 | 2h | ⬜ 待办 |
+| 2.1 | 修复知识库 embed 路径：验证 `internal/knowledge/` 与 `docs/knowledge/` 是否同步 | - | 2h | ✅ 已完成 |
+| 2.2 | 若不同步，建立构建时同步机制或修正 embed 路径 | 2.1 | 2h | ✅ 已完成 |
 | 5.1 | 创建 `internal/api/consts.go`，抽离 `BaseURL`、成功码、通用 Header | - | 2h | ⬜ 待办 |
 | 5.2 | 重构 `internal/api/*`，替换所有硬编码字符串为常量引用 | 5.1 | 3h | ⬜ 待办 |
 
@@ -67,7 +67,8 @@
 | - | service.go 单元测试全覆盖 | 2026-04-15 | `20b63f2` | `service_test.go` (3 funcs, 7 cases) |
 | - | app.go 单元测试全覆盖 | 2026-04-15 | `187623a` | `app_test.go` (3 funcs, 7 cases) |
 | - | order.go 单元测试全覆盖 | 2026-04-15 | `c871459` | `order_test.go` (1 func, 3 cases) |
-| - | cmd/sdp formatter 集成测试 | 2026-04-15 | 当前提交 | `formatter_test.go` (13 funcs, ability/service/app/order 覆盖) |
+| - | cmd/sdp formatter 集成测试 | 2026-04-15 | `638e1fe` | `formatter_test.go` (13 funcs, ability/service/app/order 覆盖) |
+| - | 修复知识库同步并建立构建同步机制 | 2026-04-15 | 当前提交 | Makefile `sync-knowledge` + `knowledge_test.go` 同步校验 |
 
 ---
 

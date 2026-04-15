@@ -23,7 +23,7 @@ GOMOD := $(GOCMD) mod
 # 默认目标
 .DEFAULT_GOAL := help
 
-.PHONY: all build build-linux build-mac build-windows build-npm clean test fmt vet install uninstall help npm-publish npm-release clean-npm-bin
+.PHONY: all build build-linux build-mac build-windows build-npm clean test fmt vet install uninstall help npm-publish npm-release clean-npm-bin sync-knowledge
 
 ## help: 显示帮助信息
 help:
@@ -44,25 +44,31 @@ help:
 	@echo "  npm-publish   发布 npm 包（需要先登录 npm）"
 	@echo "  npm-release   完整 npm 发布流程"
 
+## sync-knowledge: 同步知识库 Markdown 到 embed 目录
+sync-knowledge:
+	@echo "==> 同步知识库..."
+	@cp docs/knowledge/*.md internal/knowledge/ 2>/dev/null || true
+	@echo "==> 知识库同步完成"
+
 ## all: 清理、构建并运行测试
 all: clean build test
 
 ## build: 构建当前平台的二进制文件（开发推荐）
-build:
+build: sync-knowledge
 	@echo "==> 构建 $(BINARY_NAME)..."
 	@mkdir -p $(BUILD_DIR)
 	$(GOBUILD) $(LDFLAGS) -o $(OUTPUT) .
 	@echo "==> 构建完成: $(OUTPUT)"
 
 ## build-linux: 构建 Linux 平台二进制文件
-build-linux:
+build-linux: sync-knowledge
 	@echo "==> 构建 Linux 版本..."
 	@mkdir -p $(BUILD_DIR)
 	GOOS=linux GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 .
 	@echo "==> Linux 构建完成"
 
 ## build-mac: 构建 macOS 平台二进制文件
-build-mac:
+build-mac: sync-knowledge
 	@echo "==> 构建 macOS 版本..."
 	@mkdir -p $(BUILD_DIR)
 	GOOS=darwin GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 .
@@ -70,7 +76,7 @@ build-mac:
 	@echo "==> macOS 构建完成"
 
 ## build-windows: 构建 Windows 平台二进制文件
-build-windows:
+build-windows: sync-knowledge
 	@echo "==> 构建 Windows 版本..."
 	@mkdir -p $(BUILD_DIR)
 	GOOS=windows GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe .
