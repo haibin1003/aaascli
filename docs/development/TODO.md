@@ -18,7 +18,7 @@
 
 | # | 任务 | 负责人 | 计划完成 | 状态 |
 |---|------|--------|----------|------|
-| 1 | 建立研发规范文档（ROADMAP / WORKFLOW / CODING-STANDARDS / TODO） | - | 2026-04-15 | ✅ 已完成 |
+| 1 | 建立研发规范文档（ROADMAP / WORKFLOW / CODING-STANDARDS / TODO / AGENTS） | - | 2026-04-15 | ✅ 已完成 |
 
 ---
 
@@ -60,7 +60,8 @@
 | - | 演示材料与开源平台提案 | 2026-04-15 | `f474481` | presentation-report / proposal |
 | - | 移除二进制构建产物跟踪 | 2026-04-15 | `bc8564c` | 新增 `.gitignore`，更新 README |
 | - | 保存 Session 快照 | 2026-04-15 | `c9c3725` | `SESSION.md` |
-| - | 建立研发规范与项目路线图 | 2026-04-15 | 当前提交 | ROADMAP / WORKFLOW / CODING-STANDARDS / TODO |
+| - | 建立研发规范与项目路线图 | 2026-04-15 | `8aac4dc` | ROADMAP / WORKFLOW / CODING-STANDARDS / TODO |
+| - | 建立 AI 助手工作指南 | 2026-04-15 | 当前提交 | `AGENTS.md` + 文档索引 |
 
 ---
 
